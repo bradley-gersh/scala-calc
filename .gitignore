@@ -1,2 +1,9 @@
+# Mac files
 .DS_Store
+
+# IntelliJ IDEA files
 .idea
+
+# sbt files produced at build
+project/**
+target
