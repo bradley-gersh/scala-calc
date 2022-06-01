@@ -5,5 +5,6 @@
 .idea
 
 # sbt files produced at build
+.bsp/
 project/**
 target
