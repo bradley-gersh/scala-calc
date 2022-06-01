@@ -2,9 +2,9 @@
 .DS_Store
 
 # IntelliJ IDEA files
+.bsp/
 .idea
 
 # sbt files produced at build
-.bsp/
 project/**
 target
