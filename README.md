@@ -8,6 +8,11 @@ From the root directory of the repository, run
 
 ```shell
 sbt compile
+```
+
+To execute the program, run
+
+```shell
 sbt run
 ```
 
