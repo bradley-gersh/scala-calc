@@ -3,19 +3,31 @@ package it.scalalearn.calculator
 import org.scalatest.funsuite.AnyFunSuite
 
 class CalculatorTest extends AnyFunSuite {
-  test("Calculator.expr should parse double-precision floats") {
-    assert(Calculator.expr("4.2") === 4.2)
-    assert(Calculator.expr("-3.1") === -3.1)
-    assert(Calculator.expr("0") === 0.0)
+  test("Calculator.repl closes when a blank line is entered") {
+
   }
 
-  test("Calculator.expr should parse integers into double-precision floats") {
-    assert(Calculator.expr("3") === 3.0)
-    assert(Calculator.expr("-3") === -3.0)
+  test("Calculator.repl prints back a number when a single number is entered") {
+
   }
 
-  test("Calculator.expr should process simple addition and subtraction") {
-    assert(Calculator.expr("2 + 4") === 6.0)
-    assert(Calculator.expr("2 - 4") === -2.0)
+  test("Calculator.repl should evaluate simple sums and differences") {
+
+  }
+
+  test("Calculator.repl should evaluate simple products and quotients") {
+
+  }
+
+  test("Calculator.repl can handle parentheses") {
+
+  }
+
+  test("Calculator.repl should correctly handle order of operations") {
+
+  }
+
+  test("Calculator.repl should gracefully recover from division by 0") {
+
   }
 }

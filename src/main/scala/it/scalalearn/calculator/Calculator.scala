@@ -4,16 +4,15 @@ import scala.annotation.tailrec
 import scala.io.StdIn.readLine
 
 object Calculator {
-  def expr(input: String): Double = ???
+  /**
+   * Entry point: Print banner and run REPL
+   */
+  def main(args: Array[String]): Unit = {
 
-  @tailrec
-  def repl(): Unit = {
-    print("> ")
-    val mytext: String = readLine()
-    if (mytext.length > 0) {
-      // eval goes here
-      println(s"You entered $mytext")
-      repl()
-    }
   }
+
+  /**
+   * The REPL user interface
+   */
+  def repl(): Unit = ???
 }
