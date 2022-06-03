@@ -1,6 +1,6 @@
-import org.scalatest.funsuite.AnyFunSuite
+package it.scalalearn.calculator
 
-import it.scalalearn.calculator.Calculator
+import org.scalatest.funsuite.AnyFunSuite
 
 class CalculatorTest extends AnyFunSuite {
   test("Calculator.expr should parse double-precision floats") {
@@ -14,4 +14,8 @@ class CalculatorTest extends AnyFunSuite {
     assert(Calculator.expr("-3") === -3.0)
   }
 
+  test("Calculator.expr should process simple addition and subtraction") {
+    assert(Calculator.expr("2 + 4") === 6.0)
+    assert(Calculator.expr("2 - 4") === -2.0)
+  }
 }
