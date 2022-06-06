@@ -3,7 +3,7 @@ package it.scalalearn.calculator
 import org.scalatest.funsuite.AnyFunSuite
 
 class CalculatorTest extends AnyFunSuite {
-  test("Calculator.repl closes when a blank line is entered") {
+  test("Calculator.repl closes when an empty line is entered") {
 
   }
 

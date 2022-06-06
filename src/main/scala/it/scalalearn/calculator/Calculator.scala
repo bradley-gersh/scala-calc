@@ -8,6 +8,7 @@ object Calculator {
    * Entry point: Print banner and run REPL
    */
   def main(args: Array[String]): Unit = {
+    println("ScalaCalc v0.1\n\nEnter an empty line or ctrl-D to quit (ctrl-Z + enter on Windows).")
     repl()
   }
 
@@ -17,9 +18,9 @@ object Calculator {
   @tailrec
   def repl(): Unit = {
     print("> ")
-    val input = readLine()
-    if (input.length > 0) {
-      println(evaluate(input))
+    val input = Option(readLine())
+    if (input.getOrElse("").length > 0) {
+      println(evaluate(input.getOrElse("")))
       repl()
     } else {
       println("goodbye")
