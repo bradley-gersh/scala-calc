@@ -12,7 +12,7 @@ object Calculator {
   }
 
   /**
-   * The REPL user interface
+   * The REPL interface
    */
   @tailrec
   def repl(): Unit = {
