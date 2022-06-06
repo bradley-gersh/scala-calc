@@ -40,7 +40,7 @@ object Reader {
             case '*' => Token(TokenType.STAR, c.toString)
             case '/' => Token(TokenType.SLASH, c.toString)
             case '.' => Token(TokenType.DOT, c.toString)
-            case _ => Token(TokenType.OTHER, c.toString)
+            case _ => throw new BadTokenException(c.toString)
           }
           read(input.tail, currState, List[Char](), newToken +: tokens)
         }
@@ -49,7 +49,17 @@ object Reader {
   }
 
   def apply(input: String): Array[Token] = {
-    val tokens = read(input.toList, ReadState.DEFAULT, List[Char](), List[Token]())
+    val tokens = try {
+      read(input.toList, ReadState.DEFAULT, List[Char](), List[Token]())
+    } catch {
+      case e: BadTokenException =>
+        println(e.getMessage)
+        List[Token]()
+    }
     tokens.toArray
   }
+}
+
+class BadTokenException(private val message: String) extends Exception(message) {
+  override def getMessage: String = s"Unrecognized character: $message"
 }
