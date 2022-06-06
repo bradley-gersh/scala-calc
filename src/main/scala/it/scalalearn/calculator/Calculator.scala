@@ -31,8 +31,7 @@ object Calculator {
    */
   def evaluate(input: String): String = {
     val tokens = Reader(input)
-    tokens.foreach(println)
-    tokens.toString
+    tokens.mkString("\n")
 //    val output = Parser(tokens)
 //    output.toString
   }

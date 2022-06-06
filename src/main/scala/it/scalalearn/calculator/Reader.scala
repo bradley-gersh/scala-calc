@@ -1,31 +1,55 @@
 package it.scalalearn.calculator
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 
 object Reader {
-  val digits = """\d+""".r.unanchored
+  enum ReadState { case DEFAULT, IN_NUMBER }
+
+  def isDigit(c: Char): Boolean = (c >= '0') && (c <= '9')
+  def isWS(c: Char): Boolean = (c == ' ') || (c == '\t')
 
   /**
-   * Lexes a line of input for tokens.
+   * Process a line of input for tokens.
    */
-  def apply(input: String): Array[Token] = {
-    // is there a functional way to do the lexer?
-    val tokens = input.foldLeft(ArrayBuffer[Token]())(
-      (tokenList, char) => tokenList.append(char match {
-        case digits() => Token(TokenType.DIGIT, char.toString)
-        case '('=> Token(TokenType.LPAREN, char.toString)
-        case ')'=> Token(TokenType.RPAREN, char.toString)
-        case '+'=> Token(TokenType.PLUS, char.toString)
-        case '-'=> Token(TokenType.DASH, char.toString)
-        case '*'=> Token(TokenType.STAR, char.toString)
-        case '/'=> Token(TokenType.SLASH, char.toString)
-        case '.'=> Token(TokenType.DOT, char.toString)
-        case _ => Token(TokenType.OTHER, char.toString)
-      })
-    )
-    tokens.toArray
-
+  @tailrec
+  def read(input: List[Char], currState: ReadState, currToken: List[Char], tokens: List[Token]): List[Token] = {
+    if (currState == ReadState.IN_NUMBER) {
+      if (input.isEmpty) {
+        (Token(TokenType.NUMBER, currToken.reverse.mkString) +: tokens).reverse
+      } else {
+        val c = input.head
+        if (isDigit(c)) read(input.tail, ReadState.IN_NUMBER, c +: currToken, tokens)
+        else read(input, ReadState.DEFAULT, List[Char](), Token(TokenType.NUMBER, currToken.reverse.mkString) +: tokens)
+      }
+    } else { // ReadState.DEFAULT
+      if (input.isEmpty) {
+        tokens.reverse
+      } else {
+        val c = input.head
+        if (isDigit(c)) {
+          read(input.tail, ReadState.IN_NUMBER, List(c), tokens)
+        } else if (isWS(c)) {
+          read(input.tail, currState, currToken, tokens)
+        } else {
+          val newToken = c match {
+            case '(' => Token(TokenType.LPAREN, c.toString)
+            case ')' => Token(TokenType.RPAREN, c.toString)
+            case '+' => Token(TokenType.PLUS, c.toString)
+            case '-' => Token(TokenType.DASH, c.toString)
+            case '*' => Token(TokenType.STAR, c.toString)
+            case '/' => Token(TokenType.SLASH, c.toString)
+            case '.' => Token(TokenType.DOT, c.toString)
+            case _ => Token(TokenType.OTHER, c.toString)
+          }
+          read(input.tail, currState, List[Char](), newToken +: tokens)
+        }
+      }
+    }
   }
 
-
+  def apply(input: String): Array[Token] = {
+    val tokens = read(input.toList, ReadState.DEFAULT, List[Char](), List[Token]())
+    tokens.toArray
+  }
 }
