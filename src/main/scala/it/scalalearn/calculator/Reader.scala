@@ -4,9 +4,10 @@ import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
+/**
+ * Reader object for lexing calculator input into tokens.
+ */
 object Reader {
-  enum ReadState { case DEFAULT, IN_NUMBER }
-
   def isDigit(c: Char): Boolean = (c >= '0') && (c <= '9')
   def isWS(c: Char): Boolean = (c == ' ') || (c == '\t')
 

@@ -4,7 +4,6 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class CalculatorTest extends AnyFunSuite {
   test("Calculator.repl closes when an empty line is entered") {
-
   }
 
   test("Calculator.repl prints back a number when a single number is entered") {
