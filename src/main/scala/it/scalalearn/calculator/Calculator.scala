@@ -35,8 +35,8 @@ object Calculator {
    */
   def evaluate(input: String): String = {
     val tokens = Reader(input)
-//    tokens.fold[String](err => err.getMessage, success => success.mkString("\n"))
-    val output = tokens.map(Parser(_))
-    output.toString
+    val tree = tokens.map(Parser(_))
+    val value = tree.map(_.eval())
+    value.fold[String](err => err.getMessage, success => success.toString)
   }
 }

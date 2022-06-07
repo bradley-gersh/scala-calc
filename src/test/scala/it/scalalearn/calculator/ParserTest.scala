@@ -6,46 +6,46 @@ import scala.util.{Failure, Success}
 
 class ParserTest extends AnyFunSuite {
   test("Parser handles empty input") {
-    assert(Parser(List[Token]()).printMe() == "")
+    assert(Parser(List[Token]()).toString() == "")
   }
 
   test("Parser parses non-negative numbers") {
-    assert(Parser(List(Token(TokenType.NUMBER, "3"))).printMe() == "3.0")
-    assert(Parser(List(Token(TokenType.NUMBER, "30"))).printMe() == "30.0")
-    assert(Parser(List(Token(TokenType.NUMBER, "3.0"))).printMe() == "3.0")
-    assert(Parser(List(Token(TokenType.NUMBER, "3."))).printMe() == "3.0")
-    assert(Parser(List(Token(TokenType.NUMBER, "0.3"))).printMe() == "0.3")
-    assert(Parser(List(Token(TokenType.NUMBER, ".3"))).printMe() == "0.3")
-    assert(Parser(List(Token(TokenType.NUMBER, "03"))).printMe() == "3.0")
+    assert(Parser(List(Token(TokenType.NUMBER, "3"))).toString() == "3.0")
+    assert(Parser(List(Token(TokenType.NUMBER, "30"))).toString() == "30.0")
+    assert(Parser(List(Token(TokenType.NUMBER, "3.0"))).toString() == "3.0")
+    assert(Parser(List(Token(TokenType.NUMBER, "3."))).toString() == "3.0")
+    assert(Parser(List(Token(TokenType.NUMBER, "0.3"))).toString() == "0.3")
+    assert(Parser(List(Token(TokenType.NUMBER, ".3"))).toString() == "0.3")
+    assert(Parser(List(Token(TokenType.NUMBER, "03"))).toString() == "3.0")
   }
 
   test("Parser parses negative numbers (unary -)") {
-    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, "3"))).printMe() == "(- 3.0)")
-    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, ".3"))).printMe() == "(- 0.3)")
+    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, "3"))).toString() == "(- 3.0)")
+    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, ".3"))).toString() == "(- 0.3)")
   }
 
   test("Parser parses two-term addition and subtraction") {
     assert(Parser(List(
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.PLUS, "+"),
-      Token(TokenType.NUMBER, "3"))).printMe() == "(+ 4.0 3.0)")
+      Token(TokenType.NUMBER, "3"))).toString() == "(+ 4.0 3.0)")
 
     assert(Parser(List(
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.DASH, "-"),
-      Token(TokenType.NUMBER, "3"))).printMe() == "(- 4.0 3.0)")
+      Token(TokenType.NUMBER, "3"))).toString() == "(- 4.0 3.0)")
   }
 
   test("Parser parses two-factor multiplication and division") {
     assert(Parser(List(
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.STAR, "*"),
-      Token(TokenType.NUMBER, "3"))).printMe() == "(* 4.0 3.0)")
+      Token(TokenType.NUMBER, "3"))).toString() == "(* 4.0 3.0)")
 
     assert(Parser(List(
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.SLASH, "/"),
-      Token(TokenType.NUMBER, "3"))).printMe() == "(/ 4.0 3.0)")
+      Token(TokenType.NUMBER, "3"))).toString() == "(/ 4.0 3.0)")
   }
 
   test("Parser parses multi-term addition and subtraction") {
@@ -60,7 +60,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.PLUS, "-"),
       Token(TokenType.NUMBER, "2"),
       Token(TokenType.PLUS, "+"),
-      Token(TokenType.NUMBER, "4"))).printMe() == "(+ (- (- (+ 4.0 0.5) 6.0) 2.0) 4.0)")
+      Token(TokenType.NUMBER, "4"))).toString() == "(+ (- (- (+ 4.0 0.5) 6.0) 2.0) 4.0)")
   }
 
   test("Parser parses multi-factor multiplication and division") {
@@ -75,7 +75,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.STAR, "*"),
       Token(TokenType.NUMBER, "2"),
       Token(TokenType.SLASH, "/"),
-      Token(TokenType.NUMBER, "4"))).printMe() == "(/ (* (/ (* 4.0 0.5) 6.0) 2.0) 4.0)")
+      Token(TokenType.NUMBER, "4"))).toString() == "(/ (* (/ (* 4.0 0.5) 6.0) 2.0) 4.0)")
   }
 
   test("Parser correctly handles order of operations in expressions without parentheses") {
@@ -86,7 +86,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.STAR, "*"),
       Token(TokenType.NUMBER, "0.5"),
       Token(TokenType.PLUS, "+"),
-      Token(TokenType.NUMBER, "6"))).printMe() == "(+ (* 4.0 0.5) 6.0)")
+      Token(TokenType.NUMBER, "6"))).toString() == "(+ (* 4.0 0.5) 6.0)")
 
     // 4 + 0.5 * 6
     assert(Parser(List(
@@ -94,7 +94,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.PLUS, "+"),
       Token(TokenType.NUMBER, "0.5"),
       Token(TokenType.STAR, "*"),
-      Token(TokenType.NUMBER, "6"))).printMe() == "(+ 4.0 (* 0.5 6.0))")
+      Token(TokenType.NUMBER, "6"))).toString() == "(+ 4.0 (* 0.5 6.0))")
 
     // 4 + 0.5 * 6 - 2 / 4 * 9
     assert(Parser(List(
@@ -109,7 +109,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.STAR, "*"),
       Token(TokenType.NUMBER, "9"),
-    )).printMe() == "(- (+ 4.0 (* 0.5 6.0)) (* (/ 2.0 4.0) 9.0))")
+    )).toString() == "(- (+ 4.0 (* 0.5 6.0)) (* (/ 2.0 4.0) 9.0))")
   }
 
   test("Parser prioritizes parentheses over other operators") {
@@ -122,7 +122,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "0.5"),
       Token(TokenType.PLUS, "+"),
       Token(TokenType.NUMBER, "6"),
-      Token(TokenType.RPAREN, ")"))).printMe() == "(* 4.0 (+ 0.5 6.0))")
+      Token(TokenType.RPAREN, ")"))).toString() == "(* 4.0 (+ 0.5 6.0))")
 
     // (4 + 0.5) * 6
     assert(Parser(List(
@@ -132,7 +132,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "0.5"),
       Token(TokenType.RPAREN, ")"),
       Token(TokenType.STAR, "*"),
-      Token(TokenType.NUMBER, "6"))).printMe() == "(* (+ 4.0 0.5) 6.0)")
+      Token(TokenType.NUMBER, "6"))).toString() == "(* (+ 4.0 0.5) 6.0)")
 
   }
 
@@ -167,7 +167,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "9"),
       Token(TokenType.RPAREN, ")"),
       Token(TokenType.RPAREN, ")"),
-    )).printMe() == "(* 4.0 (+ 0.5 (+ (/ (- 6.0 (* 2.0 2.0)) (- (* 4.0 4.0) 0.5)) 9.0)))")
+    )).toString() == "(* 4.0 (+ 0.5 (+ (/ (- 6.0 (* 2.0 2.0)) (- (* 4.0 4.0) 0.5)) 9.0)))")
   }
 
   ignore("Parser throws an error if it detects the `--` sequence") {
@@ -175,7 +175,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.DASH, "-"),
       Token(TokenType.DASH, "-"),
       Token(TokenType.NUMBER, "4"),
-      Token(TokenType.NUMBER, "6"))).printMe() == "(* (+ 4.0 0.5) 6.0)")
+      Token(TokenType.NUMBER, "6"))).toString() == "(* (+ 4.0 0.5) 6.0)")
   }
 
   ignore("Parser throws an error if parentheses are empty") {

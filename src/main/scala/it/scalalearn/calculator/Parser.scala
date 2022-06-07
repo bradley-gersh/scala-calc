@@ -83,19 +83,9 @@ object Parser {
     val (leftoverTokens, tree, leftoverParens) = parseExpression(tokens, EmptyNode(), List[Token]())
     if (leftoverTokens.nonEmpty) throw new ParserException(s"unparsed tokens: $leftoverTokens")
     if (leftoverParens.nonEmpty) throw new ParserException(s"unmatched ( character(s)3 *: depth ${leftoverParens.length}")
-    printer(tree)
+    // println(tree.toString()) // optional: print the tree as an S-expression
     tree
   }
-
-  /**
-   * Prints a syntax tree in S-expressions.
-   *
-   * @param tree Root node of tree to be printed.
-   */
-  def printer(tree: ParseNode): Unit = {
-    println(tree.printMe())
-  }
-
 }
 
 class ParserException(private val message: String) extends RuntimeException(message) {
