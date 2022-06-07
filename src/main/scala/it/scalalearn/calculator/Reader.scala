@@ -72,7 +72,7 @@ object Reader {
   }
 }
 
-class LexerException(private val message: String) extends Exception(message) {
+class LexerException(private val message: String) extends RuntimeException(message) {
   override def getMessage: String = s"[error] $message"
 }
 

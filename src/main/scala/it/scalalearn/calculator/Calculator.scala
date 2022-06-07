@@ -20,7 +20,7 @@ object Calculator {
     print("> ")
     val input = Option(readLine())
     if (input.getOrElse("").length > 0) {
-      println(evaluate(input.getOrElse("")))
+      evaluate(input.getOrElse(""))
       repl()
     } else {
       println("goodbye")
