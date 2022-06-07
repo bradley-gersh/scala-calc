@@ -1,14 +1,5 @@
 package it.scalalearn.calculator
 
-/**
- * eBNF
- * expression: term
- * term: factor (+- factor)*
- * factor: sign (/* sign)*
- * sign: number | -number
- * number: NUMBER | (expression)
-   */*/
-
 trait ParseNode() {
    def isEmpty = false
    def printMe(): String
