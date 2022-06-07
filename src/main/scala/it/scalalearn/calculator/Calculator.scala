@@ -28,12 +28,15 @@ object Calculator {
   }
 
   /**
-   * Evaluate an arithmetic expression using the lexer and parser
+   * Evaluates an arithmetic expression using the lexer and parser
+   *
+   * @param  input a string of user input to be evaluated
+   * @return       string of numerical value or error message from evaluating input
    */
   def evaluate(input: String): String = {
     val tokens = Reader(input)
-    tokens.fold[String](err => err.getMessage, success => success.mkString("\n"))
-//    val output = Parser(tokens)
-//    output.toString
+//    tokens.fold[String](err => err.getMessage, success => success.mkString("\n"))
+    val output = tokens.map(Parser(_))
+    output.toString
   }
 }

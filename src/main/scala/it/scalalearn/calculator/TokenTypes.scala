@@ -7,5 +7,5 @@ enum TokenType {
   case NUMBER, LPAREN, RPAREN, DOT, PLUS, DASH, STAR, SLASH, WS, OTHER
 }
 
-case class Token(val tokenType: TokenType, val string: String)
+case class Token(tokenType: TokenType, string: String)
 

@@ -8,21 +8,23 @@ import scala.util.Try
  * Reader object for lexing calculator input into tokens.
  */
 object Reader {
+  final val SEPARATOR = '.' // May be ',' depending on locale
   def isDigit(c: Char): Boolean = (c >= '0') && (c <= '9')
   def isWS(c: Char): Boolean = (c == ' ') || (c == '\t')
 
   /**
-   * Process a line of input for tokens.
-   * @param input The remaining characters to be processed.
-   * @param tokens The tokens processed so far.
-   * @return A list of processed tokens.
+   * Processes a line of input for tokens.
+   *
+   * @param  input  list of the characters yet to be processed
+   * @param  tokens list of the tokens processed so far
+   * @return       a list of processed tokens
    */
   @tailrec
   def read(input: List[Char], tokens: List[Token]): List[Token] = {
     if (input.isEmpty) tokens.reverse // Finished processing
     else {
       val c = input.head
-      if (isDigit(c) || c == '.') { // Numeric tokens
+      if (isDigit(c) || c == SEPARATOR) { // Numeric tokens
         val (newTail, numberToken) = readNumberToken(input.tail, List(c))
         read(newTail, numberToken +: tokens)
       } else if (isWS(c)) { // Whitespace
@@ -43,11 +45,12 @@ object Reader {
   }
 
   /**
-   * Process a number token.
-   * @param input The remaining characters to be processed.
-   * @param currToken A list of the characters to be wrapped in the current token.
-   * @return A 2-tuple containing the remaining characters to be processed and the
-   *         newly generated Number token.
+   * Processes multiple digits and possibly a decimal point into a single number token.
+   *
+   * @param  input     list of the characters yet to be processed
+   * @param  currToken list of the characters to be wrapped in the current token
+   * @return          a 2-tuple containing both the remaining characters to be processed and the
+   *                  newly generated Number token.
    */
   @tailrec
   def readNumberToken(input: List[Char], currToken: List[Char], integerPart: Boolean = true): (List[Char], Token) = {
@@ -56,9 +59,9 @@ object Reader {
     } else {
       val c = input.head
       if (isDigit(c)) readNumberToken(input.tail, c +: currToken, integerPart)
-      else if (c == '.') {
+      else if (c == SEPARATOR) {
         if (integerPart) readNumberToken(input.tail, c +: currToken, false)
-        else throw new LexerException("Only one '.' character permitted per number")
+        else throw new LexerException(s"Only one '$SEPARATOR' character permitted per number")
       }
       else (input, Token(TokenType.NUMBER, currToken.reverse.mkString))
     }
