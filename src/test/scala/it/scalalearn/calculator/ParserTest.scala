@@ -63,7 +63,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "4"))).printMe() == "(+ (- (- (+ 4.0 0.5) 6.0) 2.0) 4.0)")
   }
 
-  test("Parser parses multi-term multiplication and division") {
+  test("Parser parses multi-factor multiplication and division") {
 
     // 4 * 0.5 / 6 * 2 / 4
     assert(Parser(List(
@@ -144,9 +144,9 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.STAR, "*"),
       Token(TokenType.LPAREN, "("),
       Token(TokenType.NUMBER, "0.5"),
-      Token(TokenType.LPAREN, "("),
-      Token(TokenType.LPAREN, "("),
       Token(TokenType.PLUS, "+"),
+      Token(TokenType.LPAREN, "("),
+      Token(TokenType.LPAREN, "("),
       Token(TokenType.NUMBER, "6"),
       Token(TokenType.DASH, "-"),
       Token(TokenType.NUMBER, "2"),
@@ -167,14 +167,26 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "9"),
       Token(TokenType.RPAREN, ")"),
       Token(TokenType.RPAREN, ")"),
-    )).printMe() == "(* 4.0 (+ 0.5 (+ (/ (- 6 (* 2 2)) (- (* 4 4) 0.5)) 9.0)))")
+    )).printMe() == "(* 4.0 (+ 0.5 (+ (/ (- 6.0 (* 2.0 2.0)) (- (* 4.0 4.0) 0.5)) 9.0)))")
   }
 
-  test("Parser throws an error if it detects the `--` sequence") {
+  ignore("Parser throws an error if it detects the `--` sequence") {
     assert(Parser(List(
       Token(TokenType.DASH, "-"),
       Token(TokenType.DASH, "-"),
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.NUMBER, "6"))).printMe() == "(* (+ 4.0 0.5) 6.0)")
+  }
+
+  ignore("Parser throws an error if parentheses are empty") {
+
+  }
+
+  ignore("Parser throws an error if parentheses are unmatched (left or right)") {
+
+  }
+
+  ignore("parser throws an error if a binary operator is lacking two arguments") {
+  // including in parentheses, like `5 + (3 *)`
   }
 }
