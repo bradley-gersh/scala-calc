@@ -51,7 +51,6 @@ object Parser {
 
   def parseNumber(tokens: List[Token]): (List[Token], ParseNode) = {
     val t = tokens.head
-    println(s"processing token ${t.string}")
     if (t.tokenType == TokenType.NUMBER) (tokens.tail, NumberNode(t.string.toDouble))
     else if (t.tokenType == TokenType.DASH) throw new ParserException("`--` sequence not permitted")
     else throw new ParserException(s"parse error at token $t")
