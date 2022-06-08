@@ -5,50 +5,53 @@ import org.scalatest.funsuite.AnyFunSuite
 import scala.util.{Failure, Success}
 
 class ParserTest extends AnyFunSuite {
-  test("Parser handles empty input") {
-    assert(Parser(List[Token]()).toString() == "")
+
+  // Test proper inputs
+
+  test("Parser should handle empty input") {
+    assert(Parser(List[Token]()).map(_.toString) == Success("[empty]"))
   }
 
-  test("Parser parses non-negative numbers") {
-    assert(Parser(List(Token(TokenType.NUMBER, "3"))).toString() == "3.0")
-    assert(Parser(List(Token(TokenType.NUMBER, "30"))).toString() == "30.0")
-    assert(Parser(List(Token(TokenType.NUMBER, "3.0"))).toString() == "3.0")
-    assert(Parser(List(Token(TokenType.NUMBER, "3."))).toString() == "3.0")
-    assert(Parser(List(Token(TokenType.NUMBER, "0.3"))).toString() == "0.3")
-    assert(Parser(List(Token(TokenType.NUMBER, ".3"))).toString() == "0.3")
-    assert(Parser(List(Token(TokenType.NUMBER, "03"))).toString() == "3.0")
+  test("Parser should parse non-negative numbers") {
+    assert(Parser(List(Token(TokenType.NUMBER, "3"))).map(_.toString) == Success("3.0"))
+    assert(Parser(List(Token(TokenType.NUMBER, "30"))).map(_.toString) == Success("30.0"))
+    assert(Parser(List(Token(TokenType.NUMBER, "3.0"))).map(_.toString) == Success("3.0"))
+    assert(Parser(List(Token(TokenType.NUMBER, "3."))).map(_.toString) == Success("3.0"))
+    assert(Parser(List(Token(TokenType.NUMBER, "0.3"))).map(_.toString) == Success("0.3"))
+    assert(Parser(List(Token(TokenType.NUMBER, ".3"))).map(_.toString) == Success("0.3"))
+    assert(Parser(List(Token(TokenType.NUMBER, "03"))).map(_.toString) == Success("3.0"))
   }
 
-  test("Parser parses negative numbers (unary -)") {
-    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, "3"))).toString() == "(- 3.0)")
-    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, ".3"))).toString() == "(- 0.3)")
+  test("Parser should parse negative numbers (unary -)") {
+    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, "3"))).map(_.toString) == Success("(- 3.0)"))
+    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, ".3"))).map(_.toString) == Success("(- 0.3)"))
   }
 
-  test("Parser parses two-term addition and subtraction") {
+  test("Parser should parse two-term addition and subtraction") {
     assert(Parser(List(
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.PLUS, "+"),
-      Token(TokenType.NUMBER, "3"))).toString() == "(+ 4.0 3.0)")
+      Token(TokenType.NUMBER, "3"))).map(_.toString) == Success("(+ 4.0 3.0)"))
 
     assert(Parser(List(
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.DASH, "-"),
-      Token(TokenType.NUMBER, "3"))).toString() == "(- 4.0 3.0)")
+      Token(TokenType.NUMBER, "3"))).map(_.toString) == Success("(- 4.0 3.0)"))
   }
 
-  test("Parser parses two-factor multiplication and division") {
+  test("Parser should parse two-factor multiplication and division") {
     assert(Parser(List(
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.STAR, "*"),
-      Token(TokenType.NUMBER, "3"))).toString() == "(* 4.0 3.0)")
+      Token(TokenType.NUMBER, "3"))).map(_.toString) == Success("(* 4.0 3.0)"))
 
     assert(Parser(List(
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.SLASH, "/"),
-      Token(TokenType.NUMBER, "3"))).toString() == "(/ 4.0 3.0)")
+      Token(TokenType.NUMBER, "3"))).map(_.toString) == Success("(/ 4.0 3.0)"))
   }
 
-  test("Parser parses multi-term addition and subtraction") {
+  test("Parser should parse multi-term addition and subtraction") {
 
     // 4 + 0.5 - 6 - 2 + 4
     assert(Parser(List(
@@ -60,10 +63,10 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.PLUS, "-"),
       Token(TokenType.NUMBER, "2"),
       Token(TokenType.PLUS, "+"),
-      Token(TokenType.NUMBER, "4"))).toString() == "(+ (- (- (+ 4.0 0.5) 6.0) 2.0) 4.0)")
+      Token(TokenType.NUMBER, "4"))).map(_.toString) == Success("(+ (- (- (+ 4.0 0.5) 6.0) 2.0) 4.0)"))
   }
 
-  test("Parser parses multi-factor multiplication and division") {
+  test("Parser should parse multi-factor multiplication and division") {
 
     // 4 * 0.5 / 6 * 2 / 4
     assert(Parser(List(
@@ -75,10 +78,10 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.STAR, "*"),
       Token(TokenType.NUMBER, "2"),
       Token(TokenType.SLASH, "/"),
-      Token(TokenType.NUMBER, "4"))).toString() == "(/ (* (/ (* 4.0 0.5) 6.0) 2.0) 4.0)")
+      Token(TokenType.NUMBER, "4"))).map(_.toString) == Success("(/ (* (/ (* 4.0 0.5) 6.0) 2.0) 4.0)"))
   }
 
-  test("Parser correctly handles order of operations in expressions without parentheses") {
+  test("Parser should handle order of operations in expressions without parentheses") {
 
     // 4 * 0.5 + 6
     assert(Parser(List(
@@ -86,7 +89,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.STAR, "*"),
       Token(TokenType.NUMBER, "0.5"),
       Token(TokenType.PLUS, "+"),
-      Token(TokenType.NUMBER, "6"))).toString() == "(+ (* 4.0 0.5) 6.0)")
+      Token(TokenType.NUMBER, "6"))).map(_.toString) == Success("(+ (* 4.0 0.5) 6.0)"))
 
     // 4 + 0.5 * 6
     assert(Parser(List(
@@ -94,7 +97,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.PLUS, "+"),
       Token(TokenType.NUMBER, "0.5"),
       Token(TokenType.STAR, "*"),
-      Token(TokenType.NUMBER, "6"))).toString() == "(+ 4.0 (* 0.5 6.0))")
+      Token(TokenType.NUMBER, "6"))).map(_.toString) == Success("(+ 4.0 (* 0.5 6.0))"))
 
     // 4 + 0.5 * 6 - 2 / 4 * 9
     assert(Parser(List(
@@ -109,10 +112,10 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "4"),
       Token(TokenType.STAR, "*"),
       Token(TokenType.NUMBER, "9"),
-    )).toString() == "(- (+ 4.0 (* 0.5 6.0)) (* (/ 2.0 4.0) 9.0))")
+    )).map(_.toString) == Success("(- (+ 4.0 (* 0.5 6.0)) (* (/ 2.0 4.0) 9.0))"))
   }
 
-  test("Parser prioritizes parentheses over other operators") {
+  test("Parser should prioritize parentheses over other operators") {
 
     // 4 * (0.5 + 6)
     assert(Parser(List(
@@ -122,7 +125,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "0.5"),
       Token(TokenType.PLUS, "+"),
       Token(TokenType.NUMBER, "6"),
-      Token(TokenType.RPAREN, ")"))).toString() == "(* 4.0 (+ 0.5 6.0))")
+      Token(TokenType.RPAREN, ")"))).map(_.toString) == Success("(* 4.0 (+ 0.5 6.0))"))
 
     // (4 + 0.5) * 6
     assert(Parser(List(
@@ -132,11 +135,11 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "0.5"),
       Token(TokenType.RPAREN, ")"),
       Token(TokenType.STAR, "*"),
-      Token(TokenType.NUMBER, "6"))).toString() == "(* (+ 4.0 0.5) 6.0)")
+      Token(TokenType.NUMBER, "6"))).map(_.toString) == Success("(* (+ 4.0 0.5) 6.0)"))
 
   }
 
-  test("Parser correctly handles nested parentheses") {
+  test("Parser should correctly handle nested parentheses") {
 
     // 4 * (0.5 + ((6 - 2 * 2) / ((4 * 4) - 0.5) + 9))
     assert(Parser(List(
@@ -167,26 +170,109 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.NUMBER, "9"),
       Token(TokenType.RPAREN, ")"),
       Token(TokenType.RPAREN, ")"),
-    )).toString() == "(* 4.0 (+ 0.5 (+ (/ (- 6.0 (* 2.0 2.0)) (- (* 4.0 4.0) 0.5)) 9.0)))")
+    )).map(_.toString) == Success("(* 4.0 (+ 0.5 (+ (/ (- 6.0 (* 2.0 2.0)) (- (* 4.0 4.0) 0.5)) 9.0)))"))
   }
 
-  ignore("Parser throws an error if it detects the `--` sequence") {
+  // Test mangled inputs
+
+  // Note that `---3` is parsed to -3.0 and is not considered mangled input. This is non-standard
+  // but, for a learning project, gives the chance to practice handling right associativity.
+
+  test("Parser should throw an exception in case of overflow") {
     assert(Parser(List(
+      Token(TokenType.NUMBER, "9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999")
+    )).map(_.toString).isFailure)
+  }
+
+  test("Parser should throw an exception in case of division by zero") {
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "1"),
+      Token(TokenType.SLASH, "/"),
+      Token(TokenType.NUMBER, "0"),
+    )).map(_.toString).isFailure)
+
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "1"),
+      Token(TokenType.SLASH, "/"),
+      Token(TokenType.LPAREN, "("),
+      Token(TokenType.NUMBER, "2"),
       Token(TokenType.DASH, "-"),
+      Token(TokenType.NUMBER, "2"),
+      Token(TokenType.RPAREN, ")"),
+    )).map(_.toString).isFailure)
+
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "1"),
+      Token(TokenType.SLASH, "/"),
+      Token(TokenType.LPAREN, "("),
+      Token(TokenType.NUMBER, "2"),
       Token(TokenType.DASH, "-"),
-      Token(TokenType.NUMBER, "4"),
-      Token(TokenType.NUMBER, "6"))).toString() == "(* (+ 4.0 0.5) 6.0)")
+      Token(TokenType.NUMBER, "1.9999999999999999999999999999"),
+      Token(TokenType.RPAREN, ")"),
+    )).map(_.toString).isFailure)
+
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "0.0"),
+      Token(TokenType.SLASH, "/"),
+      Token(TokenType.NUMBER, "0.0"),
+    )).map(_.toString).isFailure)
   }
 
-  ignore("Parser throws an error if parentheses are empty") {
+  test("Parser should throw an exception if parentheses are empty") {
+    assert(Parser(List(
+      Token(TokenType.LPAREN, "("),
+      Token(TokenType.RPAREN, ")"),
+    )).map(_.toString).isFailure)
 
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "1"),
+      Token(TokenType.DASH, "-"),
+      Token(TokenType.LPAREN, "("),
+      Token(TokenType.RPAREN, ")"),
+    )).map(_.toString).isFailure)
   }
 
-  ignore("Parser throws an error if parentheses are unmatched (left or right)") {
+  test("Parser should throw an exception if parentheses are unmatched (left or right)") {
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "1"),
+      Token(TokenType.SLASH, "/"),
+      Token(TokenType.LPAREN, "("),
+      Token(TokenType.NUMBER, "2"),
+    )).map(_.toString).isFailure)
 
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "1"),
+      Token(TokenType.SLASH, "/"),
+      Token(TokenType.NUMBER, "2"),
+      Token(TokenType.RPAREN, ")"),
+    )).map(_.toString).isFailure)
   }
 
-  ignore("parser throws an error if a binary operator is lacking two arguments") {
-  // including in parentheses, like `5 + (3 *)`
+  test("Parser should throw an exception if a binary operator is lacking two arguments") {
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "1"),
+      Token(TokenType.SLASH, "/"),
+    )).map(_.toString).isFailure)
+
+    assert(Parser(List(
+      Token(TokenType.SLASH, "/"),
+      Token(TokenType.NUMBER, "1"),
+    )).map(_.toString).isFailure)
+
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "5"),
+      Token(TokenType.PLUS, "+"),
+      Token(TokenType.LPAREN, "("),
+      Token(TokenType.NUMBER, "2"),
+      Token(TokenType.STAR, "*"),
+      Token(TokenType.RPAREN, ")"),
+    )).map(_.toString).isFailure)
+  }
+
+  test("Parser should throw an exception if it receives adjacent numbers without an operator or parentheses") {
+    assert(Parser(List(
+      Token(TokenType.NUMBER, "5"),
+      Token(TokenType.NUMBER, "1"),
+    )).map(_.toString).isFailure)
   }
 }

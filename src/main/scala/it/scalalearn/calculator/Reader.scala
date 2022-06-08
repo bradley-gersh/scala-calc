@@ -8,9 +8,19 @@ import scala.util.Try
  * Reader object for lexing calculator input into tokens.
  */
 object Reader {
-  final val SEPARATOR = '.' // May be ',' depending on locale
-  def isDigit(c: Char): Boolean = (c >= '0') && (c <= '9')
-  def isWS(c: Char): Boolean = (c == ' ') || (c == '\t')
+  /**
+   * Public access to Reader object
+   *
+   * @param  input  string to be lexed
+   * @return        Try object wrapping the list of tokens found in the input
+   */
+  def apply(input: String): Try[List[Token]] = {
+    Try(read(input.toList, List[Token]()))
+  }
+
+  private final val SEPARATOR = '.' // May be ',' depending on locale
+  private def isDigit(c: Char): Boolean = (c >= '0') && (c <= '9')
+  private def isWS(c: Char): Boolean = (c == ' ') || (c == '\t')
 
   /**
    * Processes a line of input for tokens.
@@ -20,7 +30,7 @@ object Reader {
    * @return       a list of processed tokens
    */
   @tailrec
-  def read(input: List[Char], tokens: List[Token]): List[Token] = {
+  private def read(input: List[Char], tokens: List[Token]): List[Token] = {
     if (input.isEmpty) tokens.reverse // Finished processing
     else {
       val c = input.head
@@ -53,7 +63,7 @@ object Reader {
    *                  newly generated Number token.
    */
   @tailrec
-  def readNumberToken(input: List[Char], currToken: List[Char], integerPart: Boolean = true): (List[Char], Token) = {
+  private def readNumberToken(input: List[Char], currToken: List[Char], integerPart: Boolean = true): (List[Char], Token) = {
     if (input.isEmpty) {
       (input, Token(TokenType.NUMBER, currToken.reverse.mkString))
     } else {
@@ -66,16 +76,10 @@ object Reader {
       else (input, Token(TokenType.NUMBER, currToken.reverse.mkString))
     }
   }
-
-  def apply(input: String): Try[List[Token]] = {
-    Try(read(input.toList, List[Token]()))
-  }
 }
 
-class LexerException(private val message: String) extends RuntimeException(message) {
-  override def getMessage: String = s"[error] $message"
-}
+class LexerException(private val message: String) extends RuntimeException(message)
 
 class UnknownTokenException(private val message: String) extends LexerException(message) {
-  override def getMessage: String = s"[error] Unrecognized character: $message"
+  override def getMessage: String = s"Unrecognized character: $message"
 }

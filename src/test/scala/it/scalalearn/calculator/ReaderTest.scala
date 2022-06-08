@@ -50,11 +50,16 @@ class ReaderTest extends AnyFunSuite {
     )))
   }
 
-  test("Reader throws an exception if it receives an unrecognized character.") {
-    assert(Reader("&").fold[String](err => "failure", success => "success") === "failure")
+  test("Reader should throw an exception if it receives an unrecognized character.") {
+    assert(Reader("&").isFailure)
   }
 
-  test("Reader throws an exception if two decimals appear in one number.") {
-    assert(Reader("4.6.4").fold[String](err => "failure", success => "success") === "failure")
+  test("Reader should throw an exception if two decimals appear in one number.") {
+    assert(Reader("4.6.4").isFailure)
+  }
+
+  test("Reader should throw an exception if it receives an isolated decimal") {
+    assert(Reader(".").isFailure)
+    assert(Reader("4 . 2").isFailure)
   }
 }
