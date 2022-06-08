@@ -1,5 +1,17 @@
 package it.scalalearn.calculator
 
+import scala.util.Try
+
+object Evaluator {
+   /**
+    * Evaluates a given parse tree for the return value
+    *
+    * @param  tree  root node of the parse tree
+    * @return       Try of the numerical value associated with evaluating the parse tree
+    */
+   def apply(tree: ParseNode): Try[Double] = Try(tree.eval())
+}
+
 trait ParseNode() {
    def isEmpty = false
    override def toString(): String
@@ -41,7 +53,7 @@ case class FactorNode(op: Token, expr1: ParseNode, expr2: ParseNode) extends Fun
       if (op.tokenType == TokenType.STAR) expr1.eval() * expr2.eval()
       else if (op.tokenType == TokenType.SLASH) {
          val numerator = expr1.eval()
-         val denominator = expr1.eval()
+         val denominator = expr2.eval()
 
          if (denominator == 0.0) {
             if (numerator == 0.0) throw new ParserException("indeterminate form 0/0 obtained")

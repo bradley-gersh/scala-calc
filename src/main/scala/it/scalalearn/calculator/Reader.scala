@@ -35,7 +35,7 @@ object Reader {
     else {
       val c = input.head
       if (isDigit(c) || c == SEPARATOR) { // Numeric tokens
-        val (newTail, numberToken) = readNumberToken(input.tail, List(c))
+        val (newTail, numberToken) = readNumberToken(input.tail, List(c), c == SEPARATOR)
         read(newTail, numberToken +: tokens)
       } else if (isWS(c)) { // Whitespace
         read(input.tail, tokens)
@@ -57,23 +57,28 @@ object Reader {
   /**
    * Processes multiple digits and possibly a decimal point into a single number token.
    *
-   * @param  input     list of the characters yet to be processed
-   * @param  currToken list of the characters to be wrapped in the current token
-   * @return          a 2-tuple containing both the remaining characters to be processed and the
-   *                  newly generated Number token.
+   * @param  input       list of the characters yet to be processed
+   * @param  currToken   list of the characters to be wrapped in the current token
+   * @param  integerPart currently lexing the fractional part of a decimal number
+   * @return             a 2-tuple containing both the remaining characters to be processed and the
+   *                     newly generated Number token.
    */
   @tailrec
-  private def readNumberToken(input: List[Char], currToken: List[Char], integerPart: Boolean = true): (List[Char], Token) = {
-    if (input.isEmpty) {
-      (input, Token(TokenType.NUMBER, currToken.reverse.mkString))
-    } else {
+  private def readNumberToken(input: List[Char], currToken: List[Char], fractionalPart: Boolean): (List[Char], Token) = {
+    def flushNumber() = {
+      val numberString = currToken.reverse.mkString
+      if (numberString == SEPARATOR.toString) throw new LexerException("isolated . not permitted")
+      else (input, Token(TokenType.NUMBER, numberString))
+    }
+
+    if (input.isEmpty) flushNumber()
+    else {
       val c = input.head
-      if (isDigit(c)) readNumberToken(input.tail, c +: currToken, integerPart)
+      if (isDigit(c)) readNumberToken(input.tail, c +: currToken, fractionalPart)
       else if (c == SEPARATOR) {
-        if (integerPart) readNumberToken(input.tail, c +: currToken, false)
+        if (!fractionalPart) readNumberToken(input.tail, c +: currToken, true)
         else throw new LexerException(s"Only one '$SEPARATOR' character permitted per number")
-      }
-      else (input, Token(TokenType.NUMBER, currToken.reverse.mkString))
+      } else flushNumber()
     }
   }
 }
