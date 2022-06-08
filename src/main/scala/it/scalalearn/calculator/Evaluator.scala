@@ -32,7 +32,11 @@ case class ExpressionNode(expr: ParseNode) extends ParseNode() {
 
 case class NumberNode(value: Double) extends ParseNode() {
    override def toString(): String = value.toString
-   override def eval(): Double = value
+   override def eval(): Double = {
+      if (value.isNaN) throw new IllegalArgumentException("NaN value evaluated")
+      else if (value.isInfinite) throw new IllegalArgumentException("infinite value evaluated")
+      else value
+   }
 }
 
 // Functions and operators
