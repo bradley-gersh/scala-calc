@@ -23,13 +23,24 @@ object Calculator {
     print("> ")
     val input = Option(readLine())
     if (input.getOrElse("").length > 0) {
-      val (trimmedInput, viewTree) = checkForShowTree(input.getOrElse(""))
-      printResult(evaluate(trimmedInput, viewTree))
+      processInput(input.getOrElse(""))
       repl()
     } else {
       println("goodbye")
     }
   }
+
+  /**
+   * Process and evaluate input from user, printing the output
+   *
+   * @param  input  raw user input for parsing
+   */
+  def processInput(input: String): Unit =
+    val (expressionInput, viewTree) =
+      if (input(0) == '?') (input.tail, true)
+      else (input, false)
+
+    printResult(evaluate(expressionInput, viewTree))
 
   /**
    * Evaluates an arithmetic expression using the lexer and parser
@@ -45,16 +56,6 @@ object Calculator {
       value <- Evaluator(tree)
     } yield (value, tree, showTree)
   }
-
-  /**
-   * Checks whether user has requested to show the parse tree
-   *
-   * @param  input  raw user input for parsing
-   * @return        a 2-tuple containing the trimmed input and Boolean indicating whether or not to show the parse tree
-   */
-  private def checkForShowTree(input: String): (String, Boolean) =
-      if (input(0) == '?') (input.tail, true)
-      else (input, false)
 
   /**
    * Displays the result of evaluating the parse tree of the computation.
