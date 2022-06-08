@@ -62,7 +62,8 @@ object Parser {
         else (tokens.tail, leftRootIn, parenLevel.tail)
       } else {
         val (remainingTokens, newExpr, newParenLevel) = parseTerm(tokens, EmptyNode(), parenLevel)
-        parseExpression(remainingTokens, newExpr, newParenLevel)
+        if (newParenLevel.nonEmpty) parseExpression(remainingTokens, newExpr, newParenLevel)
+        else (remainingTokens, newExpr, newParenLevel)
       }
     }
 
