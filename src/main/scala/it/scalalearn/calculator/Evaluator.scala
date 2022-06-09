@@ -47,7 +47,7 @@ case class NumberNode(value: Double) extends ParseNode() {
 // Functions and operators
 trait FuncNode(func: Token, exprs: ParseNode*) extends ParseNode {
    override def toString: String = s"(${func.string} " +
-     exprs.map(expr => expr.toString.mkString(" ") + ")")
+     exprs.map(expr => expr.toString).mkString(" ") + ")"
 }
 
 case class TermNode(op: Token, expr1: ParseNode, expr2: ParseNode) extends FuncNode(op, expr1, expr2) {
