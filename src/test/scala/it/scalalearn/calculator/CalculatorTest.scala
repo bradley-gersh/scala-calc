@@ -9,20 +9,6 @@ class CalculatorTest extends AnyFunSuite {
   private def nextRandomDouble(): Double = Random.nextDouble() * Random.nextInt(100)
   private def wrap(answer: Double): String = s"= $answer\n"
 
-  /**
-   * Generates a string representing a random valid expression using nested parentheses and the operators + - * /
-   * using a Markov chain
-   */
-  private def randomExpression(): String = ???
-
-    // a FSM:
-    //   if I lay down a (, I can next lay down a ( or a number.
-    //   if I lay down a number or ), I can next lay down a ) or a binary operator.
-    //   if I lay down a binary operator, I can next lay down a number or a unary operator
-    //   if I lay down a unary operator, i can lay down a unary operator or a number
-
-    //   use N numbers, N-1 binary operators, and N/2 pairs of parentheses
-
   test("Calculator.repl should close when an empty line is entered") {
     val mockOut = new ByteArrayOutputStream()
     Console.withOut(mockOut) {
@@ -124,10 +110,6 @@ class CalculatorTest extends AnyFunSuite {
 
   test("Calculator.processInput should handle nested parentheses") {
     assert(Calculator.processInput("(2 + (3 * (2 - 5) + (2)) / -7) + (5 - 3)") === wrap(5.0))
-  }
-
-  ignore("Calculator.processInput should correctly evaluate intricately nested expressions") {
-
   }
 
   test("Calculator.processInput should handle unary negative before an expression") {
