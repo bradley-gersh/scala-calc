@@ -31,8 +31,11 @@ object Parser {
     else {
       val (leftoverTokens, tree, leftoverParens) = parseExpression(tokens, EmptyNode(), List[Token]())
 
-      if (leftoverTokens.nonEmpty) throw new ParserException(
-        s"unparsed tokens: ${leftoverTokens.foldLeft(mutable.StringBuilder())((acc, token) => acc.append(token.string))}")
+      if (leftoverTokens.nonEmpty) {
+        if (leftoverTokens.contains(Token(TokenType.RPAREN, ")"))) throw new ParserException("unmatched `)`")
+        else throw new ParserException(
+          s"unparsed tokens: ${leftoverTokens.foldLeft(mutable.StringBuilder())((acc, token) => acc.append(token.string))}")
+      }
 
       if (leftoverParens.nonEmpty) throw new ParserException(s"unmatched `(`: depth ${leftoverParens.length}")
 
@@ -146,7 +149,7 @@ object Parser {
    *                      3. a list of the parenthesis depth after parsing this expression
    */
   private def parseSign(tokens: List[Token], parenLevel: List[Token]): (List[Token], ParseNode, List[Token]) = {
-    if (tokens.isEmpty) throw new ParserException("incomplete expression")
+    if (tokens.isEmpty) throw new ParserException("expression terminated where a value was expected")
 
     val t = tokens.head
     if (t.tokenType == TokenType.DASH) {
@@ -169,7 +172,7 @@ object Parser {
    * @throws ParserException if an unexpected token is found where a number or parenthesized expression should be
    */
   private def parseNumber(tokens: List[Token], parenLevel: List[Token]): (List[Token], ParseNode, List[Token]) = {
-    if (tokens.isEmpty) throw new ParserException("incomplete expression")
+    if (tokens.isEmpty) throw new ParserException("expression terminated where a value was expected")
 
     val t = tokens.head
     if (t.tokenType == TokenType.NUMBER) {

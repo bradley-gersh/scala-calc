@@ -187,7 +187,7 @@ class ParserTest extends AnyFunSuite {
       Token(TokenType.SLASH, "/"),
       Token(TokenType.NUMBER, "2"),
       Token(TokenType.RPAREN, ")")))
-    ).failure.exception.getMessage contains "unparsed tokens")
+    ).failure.exception.getMessage contains "unmatched `)`")
   }
 
   test("Parser should fail if it has leftover unclosed parentheses") {
@@ -203,7 +203,7 @@ class ParserTest extends AnyFunSuite {
     assert(convertTryToSuccessOrFailure(Parser(List(
       Token(TokenType.NUMBER, "1"),
       Token(TokenType.SLASH, "/")))
-    ).failure.exception.getMessage contains "incomplete expression")
+    ).failure.exception.getMessage contains "a value was expected")
 
     assert(convertTryToSuccessOrFailure(Parser(List(
       Token(TokenType.SLASH, "/"),
