@@ -5,7 +5,6 @@ import scala.util.{Failure, Success, Try}
 trait ParseNode() {
    def isEmpty = false
    override def toString: String
-   def visit(func: Function[ParseNode, Any]): Unit = func(this)
    def eval(): Double
 }
 
