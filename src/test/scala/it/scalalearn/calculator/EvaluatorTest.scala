@@ -3,11 +3,12 @@ package it.scalalearn.calculator
 import scala.util.Success
 
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.TryValues.convertTryToSuccessOrFailure
 
 class EvaluatorTest extends AnyFunSuite {
   test("Evaluator should fail if attempting to evaluate an empty parse tree") {
     val testEmpty = EmptyNode()
-    assert(Evaluator(testEmpty).isFailure)
+    assert(convertTryToSuccessOrFailure(Evaluator(testEmpty)).failure.exception.getMessage contains "incomplete input")
   }
 
   test("Evaluator should evaluate a single number node") {
@@ -17,24 +18,28 @@ class EvaluatorTest extends AnyFunSuite {
 
   test("Evaluator should reject a number node with NaN") {
     val testNaN = NumberNode(Double.NaN)
-    assert(Evaluator(testNaN).isFailure)
+    assert(convertTryToSuccessOrFailure(
+      Evaluator(testNaN)).failure.exception.getMessage contains "NaN")
   }
 
   test("Evaluator should reject an infinite number node") {
     val testPositiveInfinity = NumberNode(Double.PositiveInfinity)
-    assert(Evaluator(testPositiveInfinity).isFailure)
+    assert(convertTryToSuccessOrFailure(
+      Evaluator(testPositiveInfinity)).failure.exception.getMessage contains "infinite")
 
     val testNegativeInfinity = NumberNode(Double.NegativeInfinity)
-    assert(Evaluator(testNegativeInfinity).isFailure)
+    assert(convertTryToSuccessOrFailure(
+      Evaluator(testNegativeInfinity)).failure.exception.getMessage contains "infinite")
   }
 
-  test("Evaluator should fail in case of overflow") {
-    val testOverflow = TermNode(
+  test("Evaluator should fail if an infinite value is computed") {
+    val testOverflow = FactorNode(
       Token(TokenType.STAR, "*"),
       NumberNode(99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999),
       NumberNode(99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999)
     )
-    assert(Evaluator(testOverflow).isFailure)
+    assert(convertTryToSuccessOrFailure(
+      Evaluator(testOverflow)).failure.exception.getMessage contains "infinite")
   }
 
   test("Evaluator should evaluate simple sums and differences") {
@@ -83,7 +88,8 @@ class EvaluatorTest extends AnyFunSuite {
       NumberNode(2.0),
       NumberNode(0)
     )
-    assert(Evaluator(testDivZeroLiteral).isFailure)
+    assert(convertTryToSuccessOrFailure(
+      Evaluator(testDivZeroLiteral)).failure.exception.getMessage contains "division by zero")
 
     val testDivZeroSubexpression = FactorNode(
       Token(TokenType.SLASH, "/"),
@@ -93,7 +99,8 @@ class EvaluatorTest extends AnyFunSuite {
         NumberNode(5.0),
         NumberNode(5.0)
       ))
-    assert(Evaluator(testDivZeroSubexpression).isFailure)
+    assert(convertTryToSuccessOrFailure(
+      Evaluator(testDivZeroSubexpression)).failure.exception.getMessage contains "division by zero")
 
     val testDivZeroSubexpressionRoundoff = FactorNode(
       Token(TokenType.SLASH, "/"),
@@ -103,13 +110,15 @@ class EvaluatorTest extends AnyFunSuite {
         NumberNode(5.0),
         NumberNode(4.9999999999999999999999)
       ))
-    assert(Evaluator(testDivZeroSubexpressionRoundoff).isFailure)
+    assert(convertTryToSuccessOrFailure(
+      Evaluator(testDivZeroSubexpressionRoundoff)).failure.exception.getMessage contains "division by zero")
 
     val testZeroOverZero = FactorNode(
       Token(TokenType.SLASH, "/"),
       NumberNode(0),
       NumberNode(0)
     )
-    assert(Evaluator(testZeroOverZero).isFailure)
+    assert(convertTryToSuccessOrFailure(
+      Evaluator(testZeroOverZero)).failure.exception.getMessage contains "0/0")
   }
 }

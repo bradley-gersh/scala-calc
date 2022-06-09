@@ -1,6 +1,7 @@
 package it.scalalearn.calculator
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.util.Try
 
 /**
@@ -26,14 +27,17 @@ object Parser {
    * @throws ParserException if there are leftover unmatched parentheses
    */
   private def parseRoot(tokens: List[Token]): ParseNode = {
-    val (leftoverTokens, tree, leftoverParens) = parseExpression(tokens, EmptyNode(), List[Token]())
+    if (tokens.isEmpty) EmptyNode()
+    else {
+      val (leftoverTokens, tree, leftoverParens) = parseExpression(tokens, EmptyNode(), List[Token]())
 
-    if (leftoverTokens.nonEmpty) throw new ParserException(
-      s"unparsed tokens: ${leftoverTokens.foldLeft(StringBuilder())((acc, token) => acc.append(token.string))}")
+      if (leftoverTokens.nonEmpty) throw new ParserException(
+        s"unparsed tokens: ${leftoverTokens.foldLeft(mutable.StringBuilder())((acc, token) => acc.append(token.string))}")
 
-    if (leftoverParens.nonEmpty) throw new ParserException(s"unmatched `(`: depth ${leftoverParens.length}")
+      if (leftoverParens.nonEmpty) throw new ParserException(s"unmatched `(`: depth ${leftoverParens.length}")
 
-    tree
+      tree
+    }
   }
 
   /**
@@ -71,7 +75,7 @@ object Parser {
    * Parses a term (sum or difference) expression, including left associativity
    *
    * @param  tokens     tokens remaining to be parsed in this expression
-   * @param  leftrootIn if this expression is the second argument in an infix (binary) operator,
+   * @param  leftRootIn if this expression is the second argument in an infix (binary) operator,
    *                    represents the node at the root of the parse tree of the first argument
    * @param  parenLevel a List containing the as-yet unclosed parentheses at this level
    * @return            a tuple containing:
@@ -83,6 +87,7 @@ object Parser {
   private def parseTerm(tokens: List[Token],
                         leftRootIn: ParseNode,
                         parenLevel: List[Token]): (List[Token], ParseNode, List[Token]) = {
+
     val (tokensAfterLeft, leftRoot, newParenLevelLeft) =
       if (leftRootIn.isEmpty) parseFactor(tokens, leftRootIn, parenLevel)
       else (tokens, leftRootIn, parenLevel)
@@ -102,7 +107,7 @@ object Parser {
    * Parses a factor (product or quotient) expression, including left associativity
    *
    * @param  tokens     tokens remaining to be parsed in this expression
-   * @param  leftrootIn if this expression is the second argument in an infix (binary) operator,
+   * @param  leftRootIn if this expression is the second argument in an infix (binary) operator,
    *                    represents the node at the root of the parse tree of the first argument
    * @param  parenLevel a List containing the as-yet unclosed parentheses at this level
    * @return            a tuple containing:
@@ -114,6 +119,7 @@ object Parser {
   private def parseFactor(tokens: List[Token],
                           leftRootIn: ParseNode,
                           parenLevel: List[Token]): (List[Token], ParseNode, List[Token]) = {
+
     val (tokensAfterLeft, leftRoot, newParenLevelLeft) =
       if (leftRootIn.isEmpty) parseSign(tokens, parenLevel)
       else (tokens, leftRootIn, parenLevel)
@@ -140,6 +146,8 @@ object Parser {
    *                      3. a list of the parenthesis depth after parsing this expression
    */
   private def parseSign(tokens: List[Token], parenLevel: List[Token]): (List[Token], ParseNode, List[Token]) = {
+    if (tokens.isEmpty) throw new ParserException("incomplete expression")
+
     val t = tokens.head
     if (t.tokenType == TokenType.DASH) {
       val (remainingTokens, number, newParenLevel) = parseSign(tokens.tail, parenLevel)
@@ -161,6 +169,8 @@ object Parser {
    * @throws ParserException if an unexpected token is found where a number or parenthesized expression should be
    */
   private def parseNumber(tokens: List[Token], parenLevel: List[Token]): (List[Token], ParseNode, List[Token]) = {
+    if (tokens.isEmpty) throw new ParserException("incomplete expression")
+
     val t = tokens.head
     if (t.tokenType == TokenType.NUMBER) {
       val value = t.string.toDouble
@@ -172,8 +182,8 @@ object Parser {
         parseExpression(tokens.tail, EmptyNode(), t +: parenLevel)
       (remainingTokens, expr, newParenLevel)
     }
-    else throw new ParserException(s"found `${t.string}` where a number was expected")
+    else throw new ParserException(s"found `${t.string}` where a value was expected")
   }
 }
 
-class ParserException(private val message: String) extends RuntimeException(message)
+class ParserException(private val message: String) extends CalculatorException(message)

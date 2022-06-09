@@ -8,4 +8,3 @@ enum TokenType {
 }
 
 case class Token(tokenType: TokenType, string: String)
-

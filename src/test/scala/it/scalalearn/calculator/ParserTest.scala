@@ -1,8 +1,9 @@
 package it.scalalearn.calculator
 
-import org.scalatest.funsuite.AnyFunSuite
-
 import scala.util.{Failure, Success}
+
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.TryValues.convertTryToSuccessOrFailure
 
 class ParserTest extends AnyFunSuite {
 
@@ -174,48 +175,48 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("Parser should fail if it receives adjacent numbers without an operator or parentheses") {
-    assert(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser(List(
       Token(TokenType.NUMBER, "5"),
-      Token(TokenType.NUMBER, "1"),
-    )).isFailure)
+      Token(TokenType.NUMBER, "1")))
+    ).failure.exception.getMessage contains "unparsed tokens")
   }
 
   test("Parser should fail if it receives unmatched closing parentheses") {
-    assert(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser(List(
       Token(TokenType.NUMBER, "1"),
       Token(TokenType.SLASH, "/"),
       Token(TokenType.NUMBER, "2"),
-      Token(TokenType.RPAREN, ")"),
-    )).map(_.toString).isFailure)
+      Token(TokenType.RPAREN, ")")))
+    ).failure.exception.getMessage contains "unparsed tokens")
   }
 
   test("Parser should fail if it has leftover unclosed parentheses") {
-    assert(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser(List(
       Token(TokenType.NUMBER, "1"),
       Token(TokenType.SLASH, "/"),
       Token(TokenType.LPAREN, "("),
-      Token(TokenType.NUMBER, "2"),
-    )).map(_.toString).isFailure)
+      Token(TokenType.NUMBER, "2")))
+    ).failure.exception.getMessage contains "unmatched `(`")
   }
 
   test("Parser should fail if an infix binary operation is lacking two arguments") {
-    assert(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser(List(
       Token(TokenType.NUMBER, "1"),
-      Token(TokenType.SLASH, "/")
-    )).isFailure)
+      Token(TokenType.SLASH, "/")))
+    ).failure.exception.getMessage contains "incomplete expression")
 
-    assert(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser(List(
       Token(TokenType.SLASH, "/"),
-      Token(TokenType.NUMBER, "1")
-    )).isFailure)
+      Token(TokenType.NUMBER, "1")))
+    ).failure.exception.getMessage contains "a value was expected")
 
-    assert(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser(List(
       Token(TokenType.NUMBER, "5"),
       Token(TokenType.PLUS, "+"),
       Token(TokenType.LPAREN, "("),
       Token(TokenType.NUMBER, "2"),
       Token(TokenType.STAR, "*"),
-      Token(TokenType.RPAREN, ")")
-    )).isFailure)
+      Token(TokenType.RPAREN, ")")))
+    ).failure.exception.getMessage contains "a value was expected")
   }
 }
