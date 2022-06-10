@@ -13,9 +13,13 @@ object Calculator {
    * Entry point: Print banner and run REPL
    */
   def main(args: Array[String]): Unit = {
-    println("ScalaCalc v0.1\n\n"
-      + "Enter an empty line or ctrl-D to quit (ctrl-Z + enter on Windows).\n\n"
-      + "Begin input with a single ? character to view the parse tree for the expression.\n")
+    println("""
+      | ScalaCalc v0.1
+      |
+      | Enter an empty line or ctrl-D to quit (ctrl-Z + enter on Windows).
+      |
+      | Begin input with a single ? character to view the parse tree for the expression.
+      |""".stripMargin)
     repl()
   }
 
