@@ -58,6 +58,14 @@ Nystrom](http://craftinginterpreters.com/representing-code.html) for the idea):
 = -5.0
 ```
 
+## Tests
+
+The test suite is managed by `sbt` and can be run with
+
+```shell
+sbt test
+```
+
 ## References
 
 This project was heavily inspired by chapters 4–7 of Bob Nystrom's book [*Crafting Interpreters*](https://craftinginterpreters.com),
