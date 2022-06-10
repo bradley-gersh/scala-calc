@@ -6,7 +6,7 @@ import scala.util.Random
 import org.scalatest.funsuite.AnyFunSuite
 
 class CalculatorTest extends AnyFunSuite {
-  private def nextRandomDouble(): Double = Random.nextDouble() * Random.nextInt(100)
+  private def nextRandomDouble(): Double = Random.nextDouble() * Random.nextInt(100) + 0.01
   private def wrap(answer: Double): String = s"= $answer\n"
 
   test("Calculator.repl should close when an empty line is entered") {
@@ -55,7 +55,8 @@ class CalculatorTest extends AnyFunSuite {
         if (plus) randomDouble1 + randomDouble2
         else randomDouble1 - randomDouble2
       val input = s"$randomDouble1 ${if (plus) "+" else "-"} $randomDouble2"
-      assert(Calculator.processInput(input) === wrap(randomResult))
+      if (randomResult.toString.contains('E')) assert(true) // calculator doesn't allow scientific input
+      else assert(Calculator.processInput(input) === wrap(randomResult))
     }
   }
 
