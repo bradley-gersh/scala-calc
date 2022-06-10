@@ -28,7 +28,7 @@ object Lexer {
    *
    * @param  input  list of the characters yet to be processed
    * @param  tokens list of the tokens processed so far
-   * @return       a list of processed tokens
+   * @return        a list of processed tokens
    */
   @tailrec
   private def read(input: List[Char], tokens: List[Token]): List[Token] = {
