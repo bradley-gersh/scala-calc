@@ -7,48 +7,40 @@ import org.scalatest.TryValues.convertTryToSuccessOrFailure
 
 class LexerTest extends AnyFunSuite {
   test("Lexer reads in a nonnegative integer string and produces a single Number token") {
-    assert(Lexer("5") === Success(List(Token(TokenType.NUMBER, "5"))))
-    assert(Lexer("33") === Success(List(Token(TokenType.NUMBER, "33"))))
-    assert(Lexer("91023457689") === Success(List(Token(TokenType.NUMBER, "91023457689"))))
+    assert(Lexer("5") === Success(List(NUMBER("5"))))
+    assert(Lexer("33") === Success(List(NUMBER("33"))))
+    assert(Lexer("91023457689") === Success(List(NUMBER("91023457689"))))
   }
 
   test("Lexer reads in a positive decimal string and produces a Number token") {
-    assert(Lexer("4.3") === Success(List(Token(TokenType.NUMBER, "4.3"))))
-    assert(Lexer("4.") === Success(List(Token(TokenType.NUMBER, "4."))))
-    assert(Lexer(".3") === Success(List(Token(TokenType.NUMBER, ".3"))))
+    assert(Lexer("4.3") === Success(List(NUMBER("4.3"))))
+    assert(Lexer("4.") === Success(List(NUMBER("4."))))
+    assert(Lexer(".3") === Success(List(NUMBER(".3"))))
   }
 
   test("Lexer reads in various operators and produces the equivalent tokens") {
-    assert(Lexer("+-*/") === Success(List(
-      Token(TokenType.PLUS, "+"),
-      Token(TokenType.DASH, "-"),
-      Token(TokenType.STAR, "*"),
-      Token(TokenType.SLASH, "/"),
-    )))
+    assert(Lexer("+-*/") === Success(List(PLUS(), DASH(), STAR(), SLASH())))
   }
 
   test("Lexer skips whitespace") {
-    assert(Lexer("5   5") === Success(List(
-      Token(TokenType.NUMBER, "5"),
-      Token(TokenType.NUMBER, "5"),
-    )))
+    assert(Lexer("5   5") === Success(List(NUMBER("5"), NUMBER("5"))))
   }
 
   test("Lexer reads in a string of mixed characters and produces the appropriate tokens") {
     assert(Lexer("4.2-+)((  3*  7/.1 9. 00") === Success(List(
-      Token(TokenType.NUMBER, "4.2"),
-      Token(TokenType.DASH, "-"),
-      Token(TokenType.PLUS, "+"),
-      Token(TokenType.RPAREN, ")"),
-      Token(TokenType.LPAREN, "("),
-      Token(TokenType.LPAREN, "("),
-      Token(TokenType.NUMBER, "3"),
-      Token(TokenType.STAR, "*"),
-      Token(TokenType.NUMBER, "7"),
-      Token(TokenType.SLASH, "/"),
-      Token(TokenType.NUMBER, ".1"),
-      Token(TokenType.NUMBER, "9."),
-      Token(TokenType.NUMBER, "00"),
+      NUMBER("4.2"),
+      DASH(),
+      PLUS(),
+      RPAREN(),
+      LPAREN(),
+      LPAREN(),
+      NUMBER("3"),
+      STAR(),
+      NUMBER("7"),
+      SLASH(),
+      NUMBER(".1"),
+      NUMBER("9."),
+      NUMBER("00"),
     )))
   }
 

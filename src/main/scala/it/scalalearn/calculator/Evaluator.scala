@@ -30,14 +30,14 @@ object Evaluator extends Function[ParseNode, Try[Double]] {
       else if (value.isInfinite) throw new ParserException("infinite value evaluated")
       else value
     case SignNode(sign, expr) =>
-      sign.tokenType match {
-        case TokenType.PLUS => evaluate(expr)
-        case TokenType.DASH => -evaluate(expr)
+      sign match {
+        case PLUS() => evaluate(expr)
+        case DASH() => -evaluate(expr)
         case _ => throw new ParserException(s"invalid unary operator `${sign.string}`")
       }
     case FactorNode(op, expr1, expr2) =>
-      if (op.tokenType == TokenType.STAR) evaluate(expr1) * evaluate(expr2)
-      else if (op.tokenType == TokenType.SLASH) {
+      if (op == STAR()) evaluate(expr1) * evaluate(expr2)
+      else if (op == SLASH()) {
         val numerator = evaluate(expr1)
         val denominator = evaluate(expr2)
 
@@ -48,8 +48,8 @@ object Evaluator extends Function[ParseNode, Try[Double]] {
       }
       else throw new ParserException(s"improper operation ${op.string} where multiplication or division was expected")
     case TermNode(op, expr1, expr2) =>
-      if (op.tokenType == TokenType.PLUS) evaluate(expr1) + evaluate(expr2)
-      else if (op.tokenType == TokenType.DASH) evaluate(expr1) - evaluate(expr2)
+      if (op == PLUS()) evaluate(expr1) + evaluate(expr2)
+      else if (op == DASH()) evaluate(expr1) - evaluate(expr2)
       else throw new ParserException(s"improper operation ${op.string} where addition or subtraction was expected")
   }
 }

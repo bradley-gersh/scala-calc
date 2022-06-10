@@ -40,13 +40,13 @@ object Lexer {
       } else if (isWS(c)) { // Whitespace
         read(input.tail, tokens)
       } else { // One-character tokens
-        val newToken = c match {
-          case '(' => Token(TokenType.LPAREN, c.toString)
-          case ')' => Token(TokenType.RPAREN, c.toString)
-          case '+' => Token(TokenType.PLUS, c.toString)
-          case '-' => Token(TokenType.DASH, c.toString)
-          case '*' => Token(TokenType.STAR, c.toString)
-          case '/' => Token(TokenType.SLASH, c.toString)
+        val newToken: Token = c match {
+          case '(' => LPAREN()
+          case ')' => RPAREN()
+          case '+' => PLUS()
+          case '-' => DASH()
+          case '*' => STAR()
+          case '/' => SLASH()
           case _ => throw new UnknownTokenException(c.toString)
         }
         read(input.tail, newToken +: tokens)
@@ -68,7 +68,7 @@ object Lexer {
     def flushNumber() = {
       val numberString = currToken.reverse.mkString
       if (numberString == SEPARATOR.toString) throw new LexerException("isolated . not permitted")
-      else (input, Token(TokenType.NUMBER, numberString))
+      else (input, NUMBER(numberString))
     }
 
     if (input.isEmpty) flushNumber()
