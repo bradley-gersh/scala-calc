@@ -19,7 +19,7 @@ class LexerTest extends AnyFunSuite {
   }
 
   test("Lexer reads in various operators and produces the equivalent tokens") {
-    assert(Lexer("+-*/") === Success(List(PLUS(), DASH(), STAR(), SLASH())))
+    assert(Lexer("+-*/") === Success(List(PLUS, DASH, STAR, SLASH)))
   }
 
   test("Lexer skips whitespace") {
@@ -29,15 +29,15 @@ class LexerTest extends AnyFunSuite {
   test("Lexer reads in a string of mixed characters and produces the appropriate tokens") {
     assert(Lexer("4.2-+)((  3*  7/.1 9. 00") === Success(List(
       NUMBER("4.2"),
-      DASH(),
-      PLUS(),
-      RPAREN(),
-      LPAREN(),
-      LPAREN(),
+      DASH,
+      PLUS,
+      RPAREN,
+      LPAREN,
+      LPAREN,
       NUMBER("3"),
-      STAR(),
+      STAR,
       NUMBER("7"),
-      SLASH(),
+      SLASH,
       NUMBER(".1"),
       NUMBER("9."),
       NUMBER("00"),

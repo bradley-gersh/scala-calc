@@ -33,7 +33,7 @@ object Parser {
       val (leftoverTokens, tree, leftoverParens) = parseExpression(tokens, EmptyNode(), List[Token]())
 
       if (leftoverTokens.nonEmpty) {
-        if (leftoverTokens.contains(RPAREN())) throw new ParserException("unmatched `)`")
+        if (leftoverTokens.contains(RPAREN)) throw new ParserException("unmatched `)`")
         else throw new ParserException(
           s"unparsed tokens: ${leftoverTokens.foldLeft(mutable.StringBuilder())((acc, token) => acc.append(token.string))}")
       }
@@ -65,7 +65,7 @@ object Parser {
     if (tokens.isEmpty) (List(), leftRootIn, parenLevel)
     else {
       val t = tokens.head
-      if (t == RPAREN()) {
+      if (t == RPAREN) {
         if (parenLevel.isEmpty) throw new ParserException(s"unmatched `)`")
         else (tokens.tail, leftRootIn, parenLevel.tail)
       } else {
@@ -99,7 +99,7 @@ object Parser {
     if (tokensAfterLeft.isEmpty) (tokensAfterLeft, leftRoot, newParenLevelLeft)
     else {
       val t = tokensAfterLeft.head
-      if (t == PLUS() || t == DASH()) {
+      if (t == PLUS || t == DASH) {
         val (tokensAfterRight, rightRoot, newParenLevelRight) =
           parseFactor(tokensAfterLeft.tail, EmptyNode(), newParenLevelLeft)
         parseTerm(tokensAfterRight, TermNode(t, leftRoot, rightRoot), newParenLevelRight)
@@ -131,7 +131,7 @@ object Parser {
     if (tokensAfterLeft.isEmpty) (tokensAfterLeft, leftRoot, newParenLevelLeft)
     else {
       val t = tokensAfterLeft.head
-      if (t == STAR() || t == SLASH()) {
+      if (t == STAR || t == SLASH) {
         val (tokensAfterRight, rightRoot, newParenLevelRight) =
           parseSign(tokensAfterLeft.tail, newParenLevelLeft)
         parseFactor(tokensAfterRight, FactorNode(t, leftRoot, rightRoot), newParenLevelRight)
@@ -153,7 +153,7 @@ object Parser {
     if (tokens.isEmpty) throw new ParserException("expression terminated where a value was expected")
 
     val t = tokens.head
-    if (t == DASH()) {
+    if (t == DASH) {
       val (remainingTokens, number, newParenLevel) = parseSign(tokens.tail, parenLevel)
       (remainingTokens, SignNode(t, number), newParenLevel)
     }
@@ -180,7 +180,7 @@ object Parser {
       val value = t.string.toDouble
       if (value.isInfinite) throw new ParserException("infinite value obtained")
       else (tokens.tail, NumberNode(t.string.toDouble), parenLevel)
-    } else if (t == LPAREN()) {
+    } else if (t == LPAREN) {
       val (remainingTokens: List[Token], expr: ParseNode, newParenLevel) =
         parseExpression(tokens.tail, EmptyNode(), t +: parenLevel)
       (remainingTokens, expr, newParenLevel)

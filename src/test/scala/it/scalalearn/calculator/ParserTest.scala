@@ -26,30 +26,30 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("Parser should parse negative numbers (unary -)") {
-    assert(Parser(List(DASH(), NUMBER("3")))
-      === Success(SignNode(DASH(), NumberNode(3))))
-    assert(Parser(List(DASH(), NUMBER(".3")))
-      === Success(SignNode(DASH(), NumberNode(0.3))))
+    assert(Parser(List(DASH, NUMBER("3")))
+      === Success(SignNode(DASH, NumberNode(3))))
+    assert(Parser(List(DASH, NUMBER(".3")))
+      === Success(SignNode(DASH, NumberNode(0.3))))
   }
 
   test("Parser should parse two-term addition and subtraction") {
     assert(
       Parser(List(
         NUMBER("4"),
-        PLUS(),
+        PLUS,
         NUMBER("3"))) ===
       Success(TermNode(
-        PLUS(),
+        PLUS,
         NumberNode(4),
         NumberNode(3))))
 
     assert(
       Parser(List(
         NUMBER("4"),
-        DASH(),
+        DASH,
         NUMBER("3"))) ===
       Success(TermNode(
-        DASH(),
+        DASH,
         NumberNode(4),
         NumberNode(3))))
   }
@@ -58,20 +58,20 @@ class ParserTest extends AnyFunSuite {
     assert(
       Parser(List(
         NUMBER("4"),
-        STAR(),
+        STAR,
         NUMBER("3"))) ===
       Success(FactorNode(
-        STAR(),
+        STAR,
         NumberNode(4),
         NumberNode(3))))
 
     assert(
       Parser(List(
         NUMBER("4"),
-        SLASH(),
+        SLASH,
         NUMBER("3"))) ===
       Success(FactorNode(
-        SLASH(),
+        SLASH,
         NumberNode(4),
         NumberNode(3))))
   }
@@ -82,23 +82,23 @@ class ParserTest extends AnyFunSuite {
     assert(
       Parser(List(
         NUMBER("4"),
-        PLUS(),
+        PLUS,
         NUMBER("0.5"),
-        DASH(),
+        DASH,
         NUMBER("6"),
-        DASH(),
+        DASH,
         NUMBER("2"),
-        PLUS(),
+        PLUS,
         NUMBER("4"))) ===
       Success(
         TermNode(
-          PLUS(),
+          PLUS,
           TermNode(
-            DASH(),
+            DASH,
             TermNode(
-              DASH(),
+              DASH,
               TermNode(
-                PLUS(),
+                PLUS,
                 NumberNode(4),
                 NumberNode(0.5)),
               NumberNode(6)),
@@ -112,23 +112,23 @@ class ParserTest extends AnyFunSuite {
     assert(
       Parser(List(
         NUMBER("4"),
-        STAR(),
+        STAR,
         NUMBER("0.5"),
-        SLASH(),
+        SLASH,
         NUMBER("6"),
-        STAR(),
+        STAR,
         NUMBER("2"),
-        SLASH(),
+        SLASH,
         NUMBER("4"))) ===
       Success(
         FactorNode(
-          SLASH(),
+          SLASH,
           FactorNode(
-            STAR(),
+            STAR,
             FactorNode(
-              SLASH(),
+              SLASH,
               FactorNode(
-                STAR(),
+                STAR,
                 NumberNode(4),
                 NumberNode(0.5)),
               NumberNode(6)),
@@ -142,14 +142,14 @@ class ParserTest extends AnyFunSuite {
     assert(
       Parser(List(
         NUMBER("4"),
-        STAR(),
+        STAR,
         NUMBER("0.5"),
-        PLUS(),
+        PLUS,
         NUMBER("6"))) ===
       Success(TermNode(
-        PLUS(),
+        PLUS,
         FactorNode(
-          STAR(),
+          STAR,
           NumberNode(4),
           NumberNode(0.5)),
         NumberNode(6))))
@@ -158,15 +158,15 @@ class ParserTest extends AnyFunSuite {
     assert(
       Parser(List(
         NUMBER("4"),
-        PLUS(),
+        PLUS,
         NUMBER("0.5"),
-        STAR(),
+        STAR,
         NUMBER("6"))) ===
       Success(TermNode(
-        PLUS(),
+        PLUS,
         NumberNode(4),
         FactorNode(
-          STAR(),
+          STAR,
           NumberNode(0.5),
           NumberNode(6)))))
 
@@ -174,29 +174,29 @@ class ParserTest extends AnyFunSuite {
     assert(
       Parser(List(
         NUMBER("4"),
-        PLUS(),
+        PLUS,
         NUMBER("0.5"),
-        STAR(),
+        STAR,
         NUMBER("6"),
-        DASH(),
+        DASH,
         NUMBER("2"),
-        SLASH(),
+        SLASH,
         NUMBER("4"),
-        STAR(),
+        STAR,
         NUMBER("9"))) ===
       Success(TermNode(
-        DASH(),
+        DASH,
         TermNode(
-          PLUS(),
+          PLUS,
           NumberNode(4.0),
           FactorNode(
-            STAR(),
+            STAR,
             NumberNode(0.5),
             NumberNode(6))),
         FactorNode(
-          STAR(),
+          STAR,
           FactorNode(
-            SLASH(),
+            SLASH,
             NumberNode(2.0),
             NumberNode(4.0)),
           NumberNode(9)))))
@@ -208,34 +208,34 @@ class ParserTest extends AnyFunSuite {
     assert(
       Parser(List(
         NUMBER("4"),
-        STAR(),
-        LPAREN(),
+        STAR,
+        LPAREN,
         NUMBER("0.5"),
-        PLUS(),
+        PLUS,
         NUMBER("6"),
-        RPAREN())) ===
+        RPAREN)) ===
       Success(FactorNode(
-        STAR(),
+        STAR,
         NumberNode(4),
         TermNode(
-          PLUS(),
+          PLUS,
           NumberNode(0.5),
           NumberNode(6)))))
 
     // (4 + 0.5) * 6
     assert(
       Parser(List(
-        LPAREN(),
+        LPAREN,
         NUMBER("4"),
-        PLUS(),
+        PLUS,
         NUMBER("0.5"),
-        RPAREN(),
-        STAR(),
+        RPAREN,
+        STAR,
         NUMBER("6"))) ===
       Success(FactorNode(
-        STAR(),
+        STAR,
         TermNode(
-          PLUS(),
+          PLUS,
           NumberNode(4),
           NumberNode(0.5)),
         NumberNode(6))))
@@ -247,54 +247,54 @@ class ParserTest extends AnyFunSuite {
     // (2 + (3 * (2 - 5) + (2)) / -7) + (5 - 3)
     assert(
       Parser(List(
-        LPAREN(),
+        LPAREN,
         NUMBER("2"),
-        PLUS(),
-        LPAREN(),
+        PLUS,
+        LPAREN,
         NUMBER("3"),
-        STAR(),
-        LPAREN(),
+        STAR,
+        LPAREN,
         NUMBER("2"),
-        DASH(),
+        DASH,
         NUMBER("5"),
-        RPAREN(),
-        PLUS(),
-        LPAREN(),
+        RPAREN,
+        PLUS,
+        LPAREN,
         NUMBER("2"),
-        RPAREN(),
-        RPAREN(),
-        SLASH(),
-        DASH(),
+        RPAREN,
+        RPAREN,
+        SLASH,
+        DASH,
         NUMBER("7"),
-        RPAREN(),
-        PLUS(),
-        LPAREN(),
+        RPAREN,
+        PLUS,
+        LPAREN,
         NUMBER("5"),
-        DASH(),
+        DASH,
         NUMBER("3"),
-        RPAREN())) ===
+        RPAREN)) ===
       Success(TermNode(
-        PLUS(),
+        PLUS,
         TermNode(
-          PLUS(),
+          PLUS,
           NumberNode(2),
           FactorNode(
-            SLASH(),
+            SLASH,
             TermNode(
-              PLUS(),
+              PLUS,
               FactorNode(
-                STAR(),
+                STAR,
                 NumberNode(3),
                 TermNode(
-                  DASH(),
+                  DASH,
                   NumberNode(2),
                   NumberNode(5))),
               NumberNode(2)),
             SignNode(
-              DASH(),
+              DASH,
               NumberNode(7)))),
         TermNode(
-          DASH(),
+          DASH,
           NumberNode(5),
           NumberNode(3)))))
 
@@ -302,53 +302,53 @@ class ParserTest extends AnyFunSuite {
     assert(
       Parser(List(
         NUMBER("4"),
-        STAR(),
-        LPAREN(),
+        STAR,
+        LPAREN,
         NUMBER("0.5"),
-        PLUS(),
-        LPAREN(),
-        LPAREN(),
+        PLUS,
+        LPAREN,
+        LPAREN,
         NUMBER("6"),
-        DASH(),
+        DASH,
         NUMBER("2"),
-        STAR(),
+        STAR,
         NUMBER("2"),
-        RPAREN(),
-        SLASH(),
-        LPAREN(),
-        LPAREN(),
+        RPAREN,
+        SLASH,
+        LPAREN,
+        LPAREN,
         NUMBER("4"),
-        STAR(),
+        STAR,
         NUMBER("4"),
-        RPAREN(),
-        DASH(),
+        RPAREN,
+        DASH,
         NUMBER("0.5"),
-        RPAREN(),
-        PLUS(),
+        RPAREN,
+        PLUS,
         NUMBER("9"),
-        RPAREN(),
-        RPAREN())) ===
+        RPAREN,
+        RPAREN)) ===
       Success(FactorNode(
-        STAR(),
+        STAR,
         NumberNode(4),
         TermNode(
-          PLUS(),
+          PLUS,
           NumberNode(0.5),
           TermNode(
-            PLUS(),
+            PLUS,
             FactorNode(
-              SLASH(),
+              SLASH,
               TermNode(
-                DASH(),
+                DASH,
                 NumberNode(6),
                 FactorNode(
-                  STAR(),
+                  STAR,
                   NumberNode(2),
                   NumberNode(2))),
               TermNode(
-                DASH(),
+                DASH,
                 FactorNode(
-                  STAR(),
+                  STAR,
                   NumberNode(4),
                   NumberNode(4)),
                 NumberNode(0.5))),
@@ -365,17 +365,17 @@ class ParserTest extends AnyFunSuite {
   test("Parser should fail if it receives unmatched closing parentheses") {
     assert(convertTryToSuccessOrFailure(Parser(List(
       NUMBER("1"),
-      SLASH(),
+      SLASH,
       NUMBER("2"),
-      RPAREN()))
+      RPAREN))
     ).failure.exception.getMessage contains "unmatched `)`")
   }
 
   test("Parser should fail if it has leftover unclosed parentheses") {
     assert(convertTryToSuccessOrFailure(Parser(List(
       NUMBER("1"),
-      SLASH(),
-      LPAREN(),
+      SLASH,
+      LPAREN,
       NUMBER("2")))
     ).failure.exception.getMessage contains "unmatched `(`")
   }
@@ -383,21 +383,21 @@ class ParserTest extends AnyFunSuite {
   test("Parser should fail if an infix binary operation is lacking two arguments") {
     assert(convertTryToSuccessOrFailure(Parser(List(
       NUMBER("1"),
-      SLASH()))
+      SLASH))
     ).failure.exception.getMessage contains "a value was expected")
 
     assert(convertTryToSuccessOrFailure(Parser(List(
-      SLASH(),
+      SLASH,
       NUMBER("1")))
     ).failure.exception.getMessage contains "a value was expected")
 
     assert(convertTryToSuccessOrFailure(Parser(List(
       NUMBER("5"),
-      PLUS(),
-      LPAREN(),
+      PLUS,
+      LPAREN,
       NUMBER("2"),
-      STAR(),
-      RPAREN()))
+      STAR,
+      RPAREN))
     ).failure.exception.getMessage contains "a value was expected")
   }
 }

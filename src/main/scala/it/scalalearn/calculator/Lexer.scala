@@ -42,12 +42,12 @@ object Lexer {
         read(input.tail, tokens)
       } else { // One-character tokens
         val newToken: Token = c match {
-          case '(' => LPAREN()
-          case ')' => RPAREN()
-          case '+' => PLUS()
-          case '-' => DASH()
-          case '*' => STAR()
-          case '/' => SLASH()
+          case '(' => LPAREN
+          case ')' => RPAREN
+          case '+' => PLUS
+          case '-' => DASH
+          case '*' => STAR
+          case '/' => SLASH
           case _ => throw new UnknownTokenException(c.toString)
         }
         read(input.tail, newToken +: tokens)

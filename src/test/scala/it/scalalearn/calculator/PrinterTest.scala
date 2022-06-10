@@ -26,32 +26,32 @@ class PrinterTest extends AnyFunSuite {
 
   test("Printer should print unary operations") {
     val testNeg = SignNode(
-      DASH(),
+      DASH,
       NumberNode(3.2))
     assert(Printer(testNeg) === Success("(- 3.2)"))
   }
 
   test("Printer should print binary operations") {
     val testSum = TermNode(
-      PLUS(),
+      PLUS,
       NumberNode(3.1),
       NumberNode(0.1))
     assert(Printer(testSum) === Success("(+ 3.1 0.1)"))
 
     val testDifference = TermNode(
-      DASH(),
+      DASH,
       NumberNode(3.0),
       NumberNode(0.5))
     assert(Printer(testDifference) === Success("(- 3.0 0.5)"))
 
     val testProduct = FactorNode(
-      STAR(),
+      STAR,
       NumberNode(3.2),
       NumberNode(0.5))
     assert(Printer(testProduct) === Success("(* 3.2 0.5)"))
 
     val testQuotient = FactorNode(
-      SLASH(),
+      SLASH,
       NumberNode(3.2),
       NumberNode(0.1))
     assert(Printer(testQuotient) === Success("(/ 3.2 0.1)"))
@@ -59,9 +59,9 @@ class PrinterTest extends AnyFunSuite {
 
   test("Printer should handle nested operations") {
     val testSimpleNested = FactorNode(
-      STAR(),
+      STAR,
       TermNode(
-        PLUS(),
+        PLUS,
         NumberNode(5),
         NumberNode(2.2)
       ),
@@ -69,27 +69,27 @@ class PrinterTest extends AnyFunSuite {
     assert(Printer(testSimpleNested) === Success("(* (+ 5.0 2.2) 4.0)"))
 
     val testComplexNested = TermNode(
-      PLUS(),
+      PLUS,
       TermNode(
-        PLUS(),
+        PLUS,
         NumberNode(2),
         FactorNode(
-          SLASH(),
+          SLASH,
           TermNode(
-            PLUS(),
+            PLUS,
             FactorNode(
-              STAR(),
+              STAR,
               NumberNode(3),
               TermNode(
-                DASH(),
+                DASH,
                 NumberNode(2),
                 NumberNode(5))),
             NumberNode(2)),
           SignNode(
-            DASH(),
+            DASH,
             NumberNode(7)))),
       TermNode(
-        DASH(),
+        DASH,
         NumberNode(5),
         NumberNode(3)))
 
