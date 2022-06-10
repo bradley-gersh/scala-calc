@@ -51,6 +51,5 @@ object Evaluator extends Function[ParseNode, Try[Double]] {
       if (op.tokenType == TokenType.PLUS) evaluate(expr1) + evaluate(expr2)
       else if (op.tokenType == TokenType.DASH) evaluate(expr1) - evaluate(expr2)
       else throw new ParserException(s"improper operation ${op.string} where addition or subtraction was expected")
-    case ExpressionNode(expr) => evaluate(expr)
   }
 }

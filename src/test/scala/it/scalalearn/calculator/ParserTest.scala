@@ -5,66 +5,93 @@ import scala.util.{Failure, Success}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.TryValues.convertTryToSuccessOrFailure
 
+// NOTE: For brevity, I have used the Printer function to verify that the
+// proper trees were produced. For better isolation, need to create separate trees.
 class ParserTest extends AnyFunSuite {
 
   // Test proper inputs
 
   test("Parser should handle empty input") {
-    assert(Parser(List[Token]()).map(_.toString) === Success("[empty]"))
+    assert(Parser(List[Token]()) === Success(EmptyNode()))
   }
 
   test("Parser should parse non-negative numbers") {
-    assert(Parser(List(Token(TokenType.NUMBER, "3"))).map(_.toString) === Success("3.0"))
-    assert(Parser(List(Token(TokenType.NUMBER, "30"))).map(_.toString) === Success("30.0"))
-    assert(Parser(List(Token(TokenType.NUMBER, "3.0"))).map(_.toString) === Success("3.0"))
-    assert(Parser(List(Token(TokenType.NUMBER, "3."))).map(_.toString) === Success("3.0"))
-    assert(Parser(List(Token(TokenType.NUMBER, "0.3"))).map(_.toString) === Success("0.3"))
-    assert(Parser(List(Token(TokenType.NUMBER, ".3"))).map(_.toString) === Success("0.3"))
-    assert(Parser(List(Token(TokenType.NUMBER, "03"))).map(_.toString) === Success("3.0"))
+    assert(Parser(List(Token(TokenType.NUMBER, "3"))) === Success(NumberNode(3)))
+    assert(Parser(List(Token(TokenType.NUMBER, "30"))) === Success(NumberNode(30)))
+    assert(Parser(List(Token(TokenType.NUMBER, "3.0"))) === Success(NumberNode(3.0)))
+    assert(Parser(List(Token(TokenType.NUMBER, "3."))) === Success(NumberNode(3.0)))
+    assert(Parser(List(Token(TokenType.NUMBER, "0.3"))) === Success(NumberNode(0.3)))
+    assert(Parser(List(Token(TokenType.NUMBER, ".3"))) === Success(NumberNode(0.3)))
+    assert(Parser(List(Token(TokenType.NUMBER, "03"))) === Success(NumberNode(3)))
   }
 
   test("Parser should parse negative numbers (unary -)") {
-    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, "3"))).map(_.toString) === Success("(- 3.0)"))
-    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, ".3"))).map(_.toString) === Success("(- 0.3)"))
+    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, "3")))
+      === Success(SignNode(Token(TokenType.DASH, "-"), NumberNode(3))))
+    assert(Parser(List(Token(TokenType.DASH, "-"), Token(TokenType.NUMBER, ".3")))
+      === Success(SignNode(Token(TokenType.DASH, "-"), NumberNode(0.3))))
   }
 
   test("Parser should parse two-term addition and subtraction") {
-    assert(Parser(List(
-      Token(TokenType.NUMBER, "4"),
-      Token(TokenType.PLUS, "+"),
-      Token(TokenType.NUMBER, "3"))).map(_.toString) === Success("(+ 4.0 3.0)"))
+    assert(
+      Parser(List(
+        Token(TokenType.NUMBER, "4"),
+        Token(TokenType.PLUS, "+"),
+        Token(TokenType.NUMBER, "3"))) ===
+      Success(TermNode(
+        Token(TokenType.PLUS, "+"),
+        NumberNode(4),
+        NumberNode(3))))
 
-    assert(Parser(List(
-      Token(TokenType.NUMBER, "4"),
-      Token(TokenType.DASH, "-"),
-      Token(TokenType.NUMBER, "3"))).map(_.toString) === Success("(- 4.0 3.0)"))
+    assert(
+      Parser(List(
+        Token(TokenType.NUMBER, "4"),
+        Token(TokenType.DASH, "-"),
+        Token(TokenType.NUMBER, "3"))) ===
+      Success(TermNode(
+        Token(TokenType.DASH, "-"),
+        NumberNode(4),
+        NumberNode(3))))
   }
 
   test("Parser should parse two-factor multiplication and division") {
-    assert(Parser(List(
-      Token(TokenType.NUMBER, "4"),
-      Token(TokenType.STAR, "*"),
-      Token(TokenType.NUMBER, "3"))).map(_.toString) === Success("(* 4.0 3.0)"))
+    assert(
+      Parser(List(
+        Token(TokenType.NUMBER, "4"),
+        Token(TokenType.STAR, "*"),
+        Token(TokenType.NUMBER, "3"))) ===
+      Success(TermNode(
+        Token(TokenType.STAR, "*"),
+        NumberNode(4),
+        NumberNode(3))))
 
-    assert(Parser(List(
-      Token(TokenType.NUMBER, "4"),
-      Token(TokenType.SLASH, "/"),
-      Token(TokenType.NUMBER, "3"))).map(_.toString) === Success("(/ 4.0 3.0)"))
+    assert(
+      Parser(List(
+        Token(TokenType.NUMBER, "4"),
+        Token(TokenType.SLASH, "/"),
+        Token(TokenType.NUMBER, "3"))) ===
+      Success(TermNode(
+        Token(TokenType.SLASH, "/"),
+        NumberNode(4),
+        NumberNode(3))))
   }
 
   test("Parser should parse multi-term addition and subtraction") {
 
     // 4 + 0.5 - 6 - 2 + 4
-    assert(Parser(List(
-      Token(TokenType.NUMBER, "4"),
-      Token(TokenType.PLUS, "+"),
-      Token(TokenType.NUMBER, "0.5"),
-      Token(TokenType.PLUS, "-"),
-      Token(TokenType.NUMBER, "6"),
-      Token(TokenType.PLUS, "-"),
-      Token(TokenType.NUMBER, "2"),
-      Token(TokenType.PLUS, "+"),
-      Token(TokenType.NUMBER, "4"))).map(_.toString) === Success("(+ (- (- (+ 4.0 0.5) 6.0) 2.0) 4.0)"))
+    assert(
+      Parser(List(
+        Token(TokenType.NUMBER, "4"),
+        Token(TokenType.PLUS, "+"),
+        Token(TokenType.NUMBER, "0.5"),
+        Token(TokenType.PLUS, "-"),
+        Token(TokenType.NUMBER, "6"),
+        Token(TokenType.PLUS, "-"),
+        Token(TokenType.NUMBER, "2"),
+        Token(TokenType.PLUS, "+"),
+        Token(TokenType.NUMBER, "4"))) ===
+      Success(
+        "(+ (- (- (+ 4.0 0.5) 6.0) 2.0) 4.0)"))
   }
 
   test("Parser should parse multi-factor multiplication and division") {

@@ -45,29 +45,29 @@ class EvaluatorTest extends AnyFunSuite {
   test("Evaluator should evaluate simple sums and differences") {
     val testSum = TermNode(
       Token(TokenType.PLUS, "+"),
-      NumberNode(3.2),
-      NumberNode(-0.1))
-    assert(Evaluator(testSum) === Success(3.1))
+      NumberNode(3.1),
+      NumberNode(0.1))
+    assert(Evaluator(testSum) === Success(3.2))
 
     val testDifference = TermNode(
       Token(TokenType.DASH, "-"),
       NumberNode(3.0),
-      NumberNode(-0.5))
-    assert(Evaluator(testDifference) === Success(3.5))
+      NumberNode(0.5))
+    assert(Evaluator(testDifference) === Success(2.5))
   }
 
   test("Evaluator should evaluate simple products and quotients") {
     val testProduct = FactorNode(
       Token(TokenType.STAR, "*"),
       NumberNode(3.2),
-      NumberNode(-0.5))
-    assert(Evaluator(testProduct) === Success(-1.6))
+      NumberNode(0.5))
+    assert(Evaluator(testProduct) === Success(1.6))
 
     val testQuotient = FactorNode(
       Token(TokenType.SLASH, "/"),
       NumberNode(3.2),
-      NumberNode(-0.1))
-    assert(Evaluator(testQuotient) === Success(-32.0))
+      NumberNode(0.1))
+    assert(Evaluator(testQuotient) === Success(32.0))
   }
 
   test("Evaluator should handle nested operations") {
