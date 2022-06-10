@@ -189,4 +189,3 @@ object Parser {
   }
 }
 
-class ParserException(private val message: String) extends CalculatorException(message)

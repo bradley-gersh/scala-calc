@@ -82,9 +82,3 @@ object Lexer {
     }
   }
 }
-
-class LexerException(private val message: String) extends CalculatorException(message)
-
-class UnknownTokenException(private val message: String) extends LexerException(message) {
-  override def getMessage: String = s"unrecognized character: $message"
-}
