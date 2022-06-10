@@ -150,14 +150,12 @@ object Parser {
    *                      3. a list of the parenthesis depth after parsing this expression
    */
   private def parseSign(tokens: List[Token], parenLevel: List[Token]): (List[Token], ParseNode, List[Token]) = {
-    if (tokens.isEmpty) throw new ParserException("expression terminated where a value was expected")
-
-    val t = tokens.head
-    if (t == DASH) {
-      val (remainingTokens, number, newParenLevel) = parseSign(tokens.tail, parenLevel)
-      (remainingTokens, SignNode(t, number), newParenLevel)
-    }
-    else parseNumber(tokens, parenLevel)
+    tokens match {
+      case Nil => throw new ParserException("expression terminated where a value was expected")
+      case DASH :: rest =>
+              val (remainingTokens, number, newParenLevel) = parseSign(rest, parenLevel)
+              (remainingTokens, SignNode(t, number), newParenLevel)
+      case _ => parseNumber(tokens, parenLevel)
   }
 
   /**
