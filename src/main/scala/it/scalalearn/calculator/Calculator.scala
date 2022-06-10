@@ -44,7 +44,7 @@ object Calculator {
       if (input(0) == '?') (input.tail, true)
       else (input, false)
 
-    val evalOutput = evaluate(expressionInput)
+    val evalOutput = interpret(expressionInput)
 
     evalOutput match {
       case Success((value, tree)) => (
@@ -60,7 +60,7 @@ object Calculator {
    * @param  input    a preprocessed string of user input to be evaluated
    * @return          Try of numerical value from evaluating input and the parse tree for possible printing
    */
-  def evaluate(input: String): Try[(Double, ParseNode)] = {
+  def interpret(input: String): Try[(Double, ParseNode)] = {
     for {
       tokens <- Lexer(input)
       tree <- Parser(tokens)
