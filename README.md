@@ -4,17 +4,27 @@ A simple calculator program on the command line, used as a learning exercise for
 
 ## Build
 
-From the root directory of the repository, run
+The repository is managed by `sbt`, which needs to be installed on the system. To build, from the root directory of
+the repository use the command
 
 ```shell
-sbt compile
+$ sbt package
 ```
 
-To execute the program, run
+This generates `scalacalc_3-1.0.jar` in the subdirectory `target/scala-3.*`, which can be run in Scala to start
+the program:
 
 ```shell
-sbt run
+$ cd target/scala-3.1.2
+$ scala scalacalc_3-1.0.jar
 ```
+
+The program can also be run directly from within the build tool using the command
+
+```shell
+$ sbt run
+```
+
 
 ## Usage
 
@@ -60,10 +70,10 @@ Nystrom](http://craftinginterpreters.com/representing-code.html) for the idea):
 
 ## Tests
 
-The test suite is managed by `sbt` and can be run with
+A test suite is available and can be run with
 
 ```shell
-sbt test
+$ sbt test
 ```
 
 ## References
