@@ -153,9 +153,10 @@ object Parser {
     tokens match {
       case Nil => throw new ParserException("expression terminated where a value was expected")
       case DASH :: rest =>
-              val (remainingTokens, number, newParenLevel) = parseSign(rest, parenLevel)
-              (remainingTokens, SignNode(t, number), newParenLevel)
+        val (remainingTokens, number, newParenLevel) = parseSign(rest, parenLevel)
+        (remainingTokens, SignNode(DASH, number), newParenLevel)
       case _ => parseNumber(tokens, parenLevel)
+    }
   }
 
   /**
@@ -171,19 +172,15 @@ object Parser {
    * @throws ParserException if an unexpected token is found where a number or parenthesized expression should be
    */
   private def parseNumber(tokens: List[Token], parenLevel: List[Token]): (List[Token], ParseNode, List[Token]) = {
-    if (tokens.isEmpty) throw new ParserException("expression terminated where a value was expected")
-
-    val t = tokens.head
-    if (t == NUMBER(t.string)) {
-      val value = t.string.toDouble
-      if (value.isInfinite) throw new ParserException("infinite value obtained")
-      else (tokens.tail, NumberNode(t.string.toDouble), parenLevel)
-    } else if (t == LPAREN) {
-      val (remainingTokens: List[Token], expr: ParseNode, newParenLevel) =
-        parseExpression(tokens.tail, EmptyNode(), t +: parenLevel)
-      (remainingTokens, expr, newParenLevel)
+    tokens match {
+      case Nil => throw new ParserException("expression terminated where a value was expected")
+      case NUMBER(string) :: rest =>
+        val value = string.toDouble
+        if (value.isInfinite) throw new ParserException("infinite value obtained")
+        else (rest, NumberNode(string.toDouble), parenLevel)
+      case LPAREN :: rest => parseExpression(rest, EmptyNode(), LPAREN +: parenLevel)
+      case _ => throw new ParserException(s"found `${tokens.head.string}` where a value was expected")
     }
-    else throw new ParserException(s"found `${t.string}` where a value was expected")
   }
 }
 
