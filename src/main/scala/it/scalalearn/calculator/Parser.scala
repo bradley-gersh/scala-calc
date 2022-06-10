@@ -179,8 +179,7 @@ object Parser {
       val value = t.string.toDouble
       if (value.isInfinite) throw new ParserException("infinite value obtained")
       else (tokens.tail, NumberNode(t.string.toDouble), parenLevel)
-    }
-    else if (t == LPAREN()) {
+    } else if (t == LPAREN()) {
       val (remainingTokens: List[Token], expr: ParseNode, newParenLevel) =
         parseExpression(tokens.tail, EmptyNode(), t +: parenLevel)
       (remainingTokens, expr, newParenLevel)
