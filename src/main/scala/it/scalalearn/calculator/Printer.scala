@@ -6,8 +6,9 @@ import scala.util.Try
  * Flattens the parse tree to a string for printing
  */
 object Printer extends Function[ParseNode, Try[String]] {
+
   /**
-   * Public access to Printer function
+   * Public access to singleton Printer function
    *
    * @param  tree  root node of the parse tree
    * @return       string representation of the parse tree

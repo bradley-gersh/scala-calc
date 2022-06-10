@@ -5,11 +5,12 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Try
 
 /**
- * Lexer object for lexing calculator input into tokens.
+ * Lexer singleton to scan calculator input into tokens.
  */
 object Lexer {
+
   /**
-   * Public access to Reader object
+   * Public access to the Lexer object
    *
    * @param  input  string to be lexed
    * @return        Try object wrapping the list of tokens found in the input

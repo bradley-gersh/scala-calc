@@ -5,11 +5,12 @@ import scala.collection.mutable
 import scala.util.Try
 
 /**
- * Parses tokens into tree and evaluates computation
+ * Parser singleton to transform tokens into a syntax tree
  */
 object Parser {
+
   /**
-   * Public access to Parser object
+   * Public access to the Parser object
    *
    * @param  tokens a list of Tokens lexed from user input
    * @return        Try object wrapping the parse tree determined by the tokens

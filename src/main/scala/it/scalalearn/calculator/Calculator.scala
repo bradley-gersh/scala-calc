@@ -4,7 +4,11 @@ import scala.annotation.tailrec
 import scala.io.StdIn.readLine
 import scala.util.{Try, Success, Failure}
 
+/**
+ * Application for evaluating the numerical value of arithmetic expressions
+ */
 object Calculator {
+
   /**
    * Entry point: Print banner and run REPL
    */
