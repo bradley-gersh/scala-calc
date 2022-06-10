@@ -105,6 +105,7 @@ class CalculatorTest extends AnyFunSuite {
 
   test("Calculator.processInput should handle unnested parentheses") {
     assert(Calculator.processInput("(3)") === wrap(3.0))
+    assert(Calculator.processInput("(3 - 20.5)") === wrap(-17.5))
     assert(Calculator.processInput("-3 * (4 + 3)") === wrap(-21.0))
     assert(Calculator.processInput("(2 - 3) / (1 + 1)") === wrap(-0.5))
   }
