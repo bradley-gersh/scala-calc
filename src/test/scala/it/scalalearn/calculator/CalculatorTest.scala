@@ -130,6 +130,11 @@ class CalculatorTest extends AnyFunSuite {
     // consider forbidding in future by scanning unary negative with numbers at the lexer level
   }
 
+  test("Calculator.processInput should print the syntax tree when input begins with `?`") {
+    assert(Calculator.processInput("?3 + 3") === "--> parse tree: (+ 3.0 3.0)\n" + wrap(6.0))
+    assert(Calculator.processInput("? 3 + 3") === "--> parse tree: (+ 3.0 3.0)\n" + wrap(6.0))
+  }
+
   test("Calculator.processInput should accept decimal points that are empty on one side") {
     assert(Calculator.processInput(".2") === wrap(0.2))
     assert(Calculator.processInput("2.") === wrap(2.0))

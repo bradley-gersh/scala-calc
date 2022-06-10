@@ -43,7 +43,9 @@ object Calculator {
     val evalOutput = evaluate(expressionInput)
 
     evalOutput match {
-      case Success((value, tree)) => (if (viewTree) s"--> parse tree: $tree\n" else "") + s"= $value\n"
+      case Success((value, tree)) => (
+        (if (viewTree) s"--> parse tree: ${Printer(tree).getOrElse("[error printing parse tree]")}\n" else "")
+          + s"= $value\n")
       case Failure(exception: CalculatorException) => s"Syntax error: ${exception.getMessage}\n" // improper user input
       case Failure(exception) => s"[error] $exception\n ${exception.printStackTrace()}\n" // software bug
     }
