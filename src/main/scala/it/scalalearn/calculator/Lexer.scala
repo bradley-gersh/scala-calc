@@ -19,9 +19,12 @@ object Lexer {
     Try(read(input.toList, List[Token]()))
   }
 
+  /**
+   * Fragments (useful patterns that are not themselves tokens)
+   */
   private final val SEPARATOR = '.' // May be ',' depending on locale
-  private def isDigit(c: Char): Boolean = (c >= '0') && (c <= '9')
-  private def isWS(c: Char): Boolean = (c == ' ') || (c == '\t')
+  private final val DIGITS = """\d+""".r.unanchored
+  private final val WS = """\s+""".r.unanchored
 
   /**
    * Processes a line of input for tokens.
@@ -32,26 +35,30 @@ object Lexer {
    */
   @tailrec
   private def read(input: List[Char], tokens: List[Token]): List[Token] = {
-    if (input.isEmpty) tokens.reverse // Finished processing
-    else {
-      val c = input.head
-      if (isDigit(c) || c == SEPARATOR) { // Numeric tokens
-        val (newTail, numberToken) = readNumberToken(input.tail, List(c), c == SEPARATOR)
-        read(newTail, numberToken +: tokens)
-      } else if (isWS(c)) { // Whitespace
-        read(input.tail, tokens)
-      } else { // One-character tokens
-        val newToken: Token = c match {
+    input match {
+      // Finished processing
+      case Nil => tokens.reverse
+
+      // Ignore whitespace
+      case WS() :: rest => read(rest, tokens)
+
+      // Number literals
+      case (first @ (DIGITS() | SEPARATOR)) +: rest =>
+        val (newRest, numberToken) = readNumberToken(rest, List(first), first == SEPARATOR)
+        read(newRest, numberToken +: tokens)
+
+      // One-character patterns
+      case first +: rest =>
+        val newToken = first match {
           case '(' => LPAREN
           case ')' => RPAREN
           case '+' => PLUS
           case '-' => DASH
           case '*' => STAR
           case '/' => SLASH
-          case _ => throw new UnknownTokenException(c.toString)
+          case _ => throw new UnknownTokenException(first.toString)
         }
-        read(input.tail, newToken +: tokens)
-      }
+        read(rest, newToken +: tokens)
     }
   }
 
@@ -72,14 +79,12 @@ object Lexer {
       else (input, NUMBER(numberString))
     }
 
-    if (input.isEmpty) flushNumber()
-    else {
-      val c = input.head
-      if (isDigit(c)) readNumberToken(input.tail, c +: currToken, fractionalPart)
-      else if (c == SEPARATOR) {
-        if (!fractionalPart) readNumberToken(input.tail, c +: currToken, true)
+    input match {
+      case (first @ DIGITS()) :: rest => readNumberToken(rest, first :: currToken, fractionalPart)
+      case (first @ SEPARATOR) +: rest =>
+        if (!fractionalPart) readNumberToken(rest, first +: currToken, true)
         else throw new LexerException(s"only one '$SEPARATOR' character permitted per number")
-      } else flushNumber()
+      case _ => flushNumber()
     }
   }
 }
