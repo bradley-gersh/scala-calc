@@ -63,9 +63,9 @@ object Evaluator extends Function[ParseNode, Try[Double]] {
       }
       else throw new ParserException(s"improper operation ${op.string} where multiplication or division was expected")
 
-    case TermNode(op, expr1, expr2) =>
-      if (op == PLUS) evaluate(expr1) + evaluate(expr2)
-      else if (op == DASH) evaluate(expr1) - evaluate(expr2)
-      else throw new ParserException(s"improper operation ${op.string} where addition or subtraction was expected")
+    case TermNode(PLUS, expr1, expr2) => evaluate(expr1) + evaluate(expr2)
+    case TermNode(DASH, expr1, expr2) => evaluate(expr1) - evaluate(expr2)
+    case TermNode(op, _, _) =>
+         throw new ParserException(s"improper operation ${op.string} where addition or subtraction was expected")
   }
 }
