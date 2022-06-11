@@ -27,23 +27,18 @@ object Parser {
    * @throws ParserException if there are leftover unparsed tokens
    * @throws ParserException if there are leftover unmatched parentheses
    */
-  private def parseRoot(tokens: List[Token]): ParseNode = {
-    if (tokens.isEmpty) EmptyNode()
-    else {
-      val NestedParseState(leftoverTokens, tree, leftoverParens) =
-        parseExpression(NestedParseState(tokens, EmptyNode(), List[Token]()))
-
-      if (leftoverTokens.nonEmpty) {
-        if (leftoverTokens.contains(RPAREN)) throw new ParserException("unmatched `)`")
-        else throw new ParserException(
-          s"unparsed tokens: ${leftoverTokens.foldLeft(mutable.StringBuilder())((acc, token) => acc.append(token.string))}")
+  private def parseRoot(tokens: List[Token]): ParseNode =
+    if (tokens.nonEmpty) {
+      parseExpression(NestedParseState(tokens, EmptyNode(), List[Token]())) match {
+        case NestedParseState(excessTokens, _, _) if excessTokens.nonEmpty =>
+          if (excessTokens.contains(RPAREN)) throw new ParserException("unmatched `)`")
+          else throw new ParserException(
+            s"unparsed tokens: ${excessTokens.foldLeft(mutable.StringBuilder())((acc, token) => acc.append(token.string))}")
+        case NestedParseState(_, _, excessParens) if excessParens.nonEmpty =>
+          throw new ParserException(s"unmatched `(`: depth ${excessParens.length}")
+        case NestedParseState(_, tree, _) => tree
       }
-
-      if (leftoverParens.nonEmpty) throw new ParserException(s"unmatched `(`: depth ${leftoverParens.length}")
-
-      tree
-    }
-  }
+    } else EmptyNode()
 
   /**
    * Parses an expression, either wrapped in parentheses or in outermost scope
