@@ -62,17 +62,15 @@ object Parser {
   private def parseExpression(tokens: List[Token],
                               leftRootIn: ParseNode,
                               parenLevel: List[Token]): (List[Token], ParseNode, List[Token]) =
-    if (tokens.isEmpty) (List(), leftRootIn, parenLevel)
-    else {
-      val t = tokens.head
-      if (t == RPAREN) {
+    tokens match {
+      case Nil => (List(), leftRootIn, parenLevel)
+      case RPAREN :: rest =>
         if (parenLevel.isEmpty) throw new ParserException(s"unmatched `)`")
-        else (tokens.tail, leftRootIn, parenLevel.tail)
-      } else {
+        else (rest, leftRootIn, parenLevel.tail)
+      case _ =>
         val (remainingTokens, newExpr, newParenLevel) = parseTerm(tokens, EmptyNode(), parenLevel)
         if (newParenLevel.nonEmpty) parseExpression(remainingTokens, newExpr, newParenLevel)
         else (remainingTokens, newExpr, newParenLevel)
-      }
     }
 
   /**
@@ -96,14 +94,12 @@ object Parser {
       if (leftRootIn.isEmpty) parseFactor(tokens, leftRootIn, parenLevel)
       else (tokens, leftRootIn, parenLevel)
 
-    if (tokensAfterLeft.isEmpty) (tokensAfterLeft, leftRoot, newParenLevelLeft)
-    else {
-      val t = tokensAfterLeft.head
-      if (t == PLUS || t == DASH) {
-        val (tokensAfterRight, rightRoot, newParenLevelRight) =
-          parseFactor(tokensAfterLeft.tail, EmptyNode(), newParenLevelLeft)
-        parseTerm(tokensAfterRight, TermNode(t, leftRoot, rightRoot), newParenLevelRight)
-      } else (tokensAfterLeft, leftRoot, newParenLevelLeft)
+    tokensAfterLeft match {
+      case Nil => (tokensAfterLeft, leftRoot, newParenLevelLeft)
+      case (first @ (PLUS | DASH)) :: rest =>
+        val (tokensAfterRight, rightRoot, newParenLevelRight) = parseFactor(rest, EmptyNode(), newParenLevelLeft)
+        parseTerm(tokensAfterRight, TermNode(first, leftRoot, rightRoot), newParenLevelRight)
+      case _ => (tokensAfterLeft, leftRoot, newParenLevelLeft)
     }
   }
 
@@ -128,14 +124,12 @@ object Parser {
       if (leftRootIn.isEmpty) parseSign(tokens, parenLevel)
       else (tokens, leftRootIn, parenLevel)
 
-    if (tokensAfterLeft.isEmpty) (tokensAfterLeft, leftRoot, newParenLevelLeft)
-    else {
-      val t = tokensAfterLeft.head
-      if (t == STAR || t == SLASH) {
-        val (tokensAfterRight, rightRoot, newParenLevelRight) =
-          parseSign(tokensAfterLeft.tail, newParenLevelLeft)
-        parseFactor(tokensAfterRight, FactorNode(t, leftRoot, rightRoot), newParenLevelRight)
-      } else (tokensAfterLeft, leftRoot, newParenLevelLeft)
+    tokensAfterLeft match {
+      case Nil => (tokensAfterLeft, leftRoot, newParenLevelLeft)
+      case (first @ (STAR | SLASH)) :: rest =>
+        val (tokensAfterRight, rightRoot, newParenLevelRight) = parseSign(rest, newParenLevelLeft)
+        parseFactor(tokensAfterRight, FactorNode(first, leftRoot, rightRoot), newParenLevelRight)
+      case _ => (tokensAfterLeft, leftRoot, newParenLevelLeft)
     }
   }
 
@@ -181,6 +175,7 @@ object Parser {
       case LPAREN :: rest => parseExpression(rest, EmptyNode(), LPAREN +: parenLevel)
       case _ => throw new ParserException(s"found `${tokens.head.string}` where a value was expected")
     }
+
   }
 }
 
