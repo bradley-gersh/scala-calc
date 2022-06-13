@@ -19,11 +19,9 @@ object Lexer {
    * Processes a line of input for tokens.
    *
    * @param  input  string to be lexed
-   * @return        Try object wrapping the list of tokens found in the input
+   * @return        Either an error message or the list of tokens found in the input
    */
-  def read(input: String): Try[List[Token]] = {
-    Try(read(input.toList, List[Token]()))
-  }
+  def read(input: String): Either[String, List[Token]] = read(input.toList, List[Token]())
 
   /**
    * Processes a line of input for tokens.
@@ -49,12 +47,18 @@ object Lexer {
         }
 
       // One-character patterns
-      case first +: rest => read(rest, readSingleCharToken(first) +: tokens)
+      case first +: rest => readSingleCharToken(first) match {
+        case UNKNOWN(unknownToken) => Left(s"unrecognized character $unknownToken")
+        case newToken => read(rest, newToken +: tokens)
+      }
     }
   }
 
   /**
    * Produce a single-character token
+   *
+   * @param char  a (single) character to be interpreted as a token
+   * @return      a Token object matched to the input
    */
   private def readSingleCharToken(char: Char): Token = char match {
     case '(' => LPAREN
@@ -63,7 +67,7 @@ object Lexer {
     case '-' => DASH
     case '*' => STAR
     case '/' => SLASH
-    case _ => throw new UnknownTokenException (char.toString)
+    case _ => UNKNOWN(char.toString)
   }
 
   /**

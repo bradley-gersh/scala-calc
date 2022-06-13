@@ -14,7 +14,7 @@ object Parser {
    * @param  tokens a list of Tokens lexed from user input
    * @return        Either an error message or the parse tree determined by the tokens
    */
-  def apply(tokens: List[Token]): Either[String, ParseNode] = parseRoot(tokens)
+  def parse(tokens: List[Token]): Either[String, ParseNode] = parseRoot(tokens)
 
   /**
    * Begin and terminate parsing by recursive descent

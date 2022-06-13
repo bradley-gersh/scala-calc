@@ -9,23 +9,23 @@ class ParserTest extends AnyFunSuite {
   // Test proper inputs
 
   test("Parser should handle empty input") {
-    assert(Parser(List[Token]()) === Right(EmptyNode))
+    assert(Parser.parse(List[Token]()) === Right(EmptyNode))
   }
 
   test("Parser should parse non-negative numbers") {
-    assert(Parser(List(NUMBER("3"))) === Right(NumberNode(3)))
-    assert(Parser(List(NUMBER("30"))) === Right(NumberNode(30)))
-    assert(Parser(List(NUMBER("3.0"))) === Right(NumberNode(3.0)))
-    assert(Parser(List(NUMBER("3."))) === Right(NumberNode(3.0)))
-    assert(Parser(List(NUMBER("0.3"))) === Right(NumberNode(0.3)))
-    assert(Parser(List(NUMBER(".3"))) === Right(NumberNode(0.3)))
-    assert(Parser(List(NUMBER("03"))) === Right(NumberNode(3)))
+    assert(Parser.parse(List(NUMBER("3"))) === Right(NumberNode(3)))
+    assert(Parser.parse(List(NUMBER("30"))) === Right(NumberNode(30)))
+    assert(Parser.parse(List(NUMBER("3.0"))) === Right(NumberNode(3.0)))
+    assert(Parser.parse(List(NUMBER("3."))) === Right(NumberNode(3.0)))
+    assert(Parser.parse(List(NUMBER("0.3"))) === Right(NumberNode(0.3)))
+    assert(Parser.parse(List(NUMBER(".3"))) === Right(NumberNode(0.3)))
+    assert(Parser.parse(List(NUMBER("03"))) === Right(NumberNode(3)))
   }
 
   test("Parser should parse negative numbers (unary -)") {
-    assert(Parser(List(DASH, NUMBER("3")))
+    assert(Parser.parse(List(DASH, NUMBER("3")))
       === Right(SignNode(DASH, NumberNode(3))))
-    assert(Parser(List(DASH, NUMBER(".3")))
+    assert(Parser.parse(List(DASH, NUMBER(".3")))
       === Right(SignNode(DASH, NumberNode(0.3))))
   }
 
@@ -353,22 +353,22 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("Parser should fail if it receives adjacent numbers without an operator or parentheses") {
-    assert(Parser(List(NUMBER("5"), NUMBER("1"))).left.filterToOption(_ contains "unparsed tokens").nonEmpty)
+    assert(Parser.parse(List(NUMBER("5"), NUMBER("1"))).left.filterToOption(_ contains "unparsed tokens").nonEmpty)
   }
 
   test("Parser should fail if it receives unmatched closing parentheses") {
-    assert(Parser(List(NUMBER("1"), SLASH, NUMBER("2"), RPAREN)).left.filterToOption(_ contains "unmatched `)`").nonEmpty)
+    assert(Parser.parse(List(NUMBER("1"), SLASH, NUMBER("2"), RPAREN)).left.filterToOption(_ contains "unmatched `)`").nonEmpty)
   }
 
   test("Parser should fail if it has leftover unclosed parentheses") {
-    assert(Parser(List(NUMBER("1"), SLASH, LPAREN, NUMBER("2"))).left.filterToOption(_ contains "unmatched `(`").nonEmpty)
+    assert(Parser.parse(List(NUMBER("1"), SLASH, LPAREN, NUMBER("2"))).left.filterToOption(_ contains "unmatched `(`").nonEmpty)
   }
 
   test("Parser should fail if an infix binary operation is lacking two arguments") {
-    assert(Parser(List(NUMBER("1"), SLASH)).left.filterToOption(_ contains "a value was expected").nonEmpty)
+    assert(Parser.parse(List(NUMBER("1"), SLASH)).left.filterToOption(_ contains "a value was expected").nonEmpty)
 
-    assert(Parser(List(SLASH, NUMBER("1"))).left.filterToOption(_ contains "a value was expected").nonEmpty)
+    assert(Parser.parse(List(SLASH, NUMBER("1"))).left.filterToOption(_ contains "a value was expected").nonEmpty)
 
-    assert(Parser(List(NUMBER("5"), PLUS, LPAREN, NUMBER("2"), STAR, RPAREN)).left.filterToOption(_ contains "a value was expected").nonEmpty)
+    assert(Parser.parse(List(NUMBER("5"), PLUS, LPAREN, NUMBER("2"), STAR, RPAREN)).left.filterToOption(_ contains "a value was expected").nonEmpty)
   }
 }
