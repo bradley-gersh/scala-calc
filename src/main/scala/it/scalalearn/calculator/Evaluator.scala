@@ -40,11 +40,15 @@ object Evaluator extends Function[ParseNode, Either[String, Double]] {
 
     case FactorNode(STAR, expr1, expr2) => evaluate(expr1).flatMap(val1 => evaluate(expr2).map(val2 => val1 * val2))
     case FactorNode(SLASH, expr1, expr2) =>
-      evaluate(expr1).flatMap(numerator => evaluate(expr2).map(denominator => (numerator, denominator) match {
-//        case (0.0, 0.0) => Left("indeterminate form 0/0 obtained")
-//        case (_, 0.0) => Left("division by 0")
-        case _ => numerator / denominator
-      }))
+      val numerator = evaluate(expr1)
+      val denominator = evaluate(expr2)
+      (numerator, denominator) match {
+        case (Left(error), _) => Left(error)
+        case (_, Left(error)) => Left(error)
+        case (Right(0.0), Right(0.0)) => Left("indeterminate form 0/0 obtained")
+        case (_, Right(0.0)) => Left("division by 0")
+        case (Right(num), Right(denom)) => Right(num / denom)
+      }
 
     case FactorNode(op, _, _) => Left(s"improper operation ${op.string} where multiplication or division was expected")
 

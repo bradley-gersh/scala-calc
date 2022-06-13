@@ -50,7 +50,7 @@ object Calculator {
     interpret(expressionInput) match {
       case Left(error) => s"[error]: $error\n"
       case Right((value, tree)) => (
-        (if (viewTree) s"--> parse tree: ${Printer(tree).getOrElse("[error printing parse tree]")}\n" else "")
+        (if (viewTree) s"--> parse tree: ${Printer(tree)}\n" else "")
           + s"= $value\n")
     }
 
