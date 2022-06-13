@@ -27,15 +27,12 @@ object Calculator {
    * REPL interface
    */
   @tailrec
-  def repl(): Unit = {
-    val input = Option(readLine("> "))
-    if (input.getOrElse("").nonEmpty) {
-      println(processInput(input.getOrElse("")))
-      repl()
-    } else {
-      println("goodbye")
+  def repl(): Unit =
+    Option(readLine("> ")) match {
+      case Some(input) if input.nonEmpty => println(processInput(input))
+        repl()
+      case _ => println("goodbye")
     }
-  }
 
   /**
    * Processes and evaluates input from user
