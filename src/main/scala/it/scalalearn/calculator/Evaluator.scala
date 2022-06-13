@@ -40,20 +40,25 @@ object Evaluator {
 
     case FactorNode(STAR, expr1, expr2) => evaluate(expr1).flatMap(val1 => evaluate(expr2).map(val2 => val1 * val2))
     case FactorNode(SLASH, expr1, expr2) =>
-      val numerator = evaluate(expr1)
-      val denominator = evaluate(expr2)
-      (numerator, denominator) match {
-        case (Left(error), _) => Left(error)
-        case (_, Left(error)) => Left(error)
-        case (Right(0.0), Right(0.0)) => Left(DivisionByZeroException("indeterminate form 0/0 obtained"))
-        case (_, Right(0.0)) => Left(DivisionByZeroException("division by 0"))
-        case (Right(num), Right(denom)) => Right(num / denom)
-      }
+      for {
+        numerator <- evaluate(expr1)
+        denominator <- evaluate(expr2)
+        tuple <- validateDivision(numerator, denominator)
+      } yield tuple._1 / tuple._2 // destructuring not allowed on tuples in for comprehensions
 
     case FactorNode(op, _, _) => Left(InvalidOperatorException(s"improper operation ${op.string} where multiplication or division was expected"))
 
     case TermNode(PLUS, expr1, expr2) => evaluate(expr1).flatMap(val1 => evaluate(expr2).map(val2 => val1 + val2))
     case TermNode(DASH, expr1, expr2) => evaluate(expr1).flatMap(val1 => evaluate(expr2).map(val2 => val1 - val2))
     case TermNode(op, _, _) => Left(InvalidOperatorException(s"improper operation ${op.string} where addition or subtraction was expected"))
+  }
+
+  /**
+   * Validates numerator and denominator for division
+   */
+  private def validateDivision(numerator: Double, denominator: Double): Either[CalculatorException, (Double, Double)] = {
+    if (numerator == 0 && denominator == 0) Left(DivisionByZeroException("indeterminate form 0/0 obtained"))
+    else if (denominator == 0) Left(DivisionByZeroException("division by 0"))
+    else Right(numerator, denominator)
   }
 }
