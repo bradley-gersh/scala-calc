@@ -25,13 +25,15 @@ object Parser {
   private def parseRoot(tokens: List[Token]): Either[String, ParseNode] =
     if (tokens.nonEmpty) {
       parseExpression(NestedParseState(tokens, EmptyNode, List[Token]())) match {
-        case NestedParseState(excessTokens, _, _) if excessTokens.nonEmpty =>
+        case Left(error) => Left(error)
+
+        case Right(NestedParseState(excessTokens, _, _)) if excessTokens.nonEmpty =>
           if (excessTokens.contains(RPAREN)) Left("unmatched `)`")
           else Left(s"unparsed tokens: ${excessTokens.foldLeft(mutable.StringBuilder())((acc, token) => acc.append(token.string))}")
 
-        case NestedParseState(_, _, excessParens) if excessParens.nonEmpty => Left(s"unmatched `(`: depth ${excessParens.length}")
+        case Right(NestedParseState(_, _, excessParens)) if excessParens.nonEmpty => Left(s"unmatched `(`: depth ${excessParens.length}")
 
-        case NestedParseState(_, tree, _) => Right(tree)
+        case Right(NestedParseState(_, tree, _)) => Right(tree)
       }
     } else Right(EmptyNode)
 
@@ -61,10 +63,12 @@ object Parser {
         else Right(NestedParseState(rest, leftRootIn, parens.tail))
 
       case _ =>
-        val NestedParseState(remainingTokens, newExpr, newParens) =
-          parseTerm(NestedParseState(tokens, EmptyNode, parens))
-        if (newParens.nonEmpty) parseExpression(NestedParseState(remainingTokens, newExpr, newParens))
-        else Right(NestedParseState(remainingTokens, newExpr, newParens))
+        parseTerm(NestedParseState(tokens, EmptyNode, parens)) match {
+          case Left(error) => Left(error)
+          case Right(NestedParseState(remainingTokens, newExpr, newParens)) =>
+            if (newParens.nonEmpty) parseExpression(NestedParseState(remainingTokens, newExpr, newParens))
+            else Right(NestedParseState(remainingTokens, newExpr, newParens))
+        }
     }
 
   /**
@@ -92,9 +96,11 @@ object Parser {
     tokensAfterLeft match {
       case Nil => Right(NestedParseState(tokensAfterLeft, leftRoot, newParensLeft))
       case (first @ (PLUS | DASH)) :: rest =>
-        val NestedParseState(tokensAfterRight, rightRoot, newParensRight) =
-          parseFactor(NestedParseState(rest, EmptyNode, newParensLeft))
-        parseTerm(NestedParseState(tokensAfterRight, TermNode(first, leftRoot, rightRoot), newParensRight))
+        parseFactor(NestedParseState(rest, EmptyNode, newParensLeft)) match {
+          case Left(error) => Left(error)
+          case Right(NestedParseState(tokensAfterRight, rightRoot, newParensRight)) =>
+            parseTerm(NestedParseState(tokensAfterRight, TermNode(first, leftRoot, rightRoot), newParensRight))
+        }
       case _ => Right(NestedParseState(tokensAfterLeft, leftRoot, newParensLeft))
     }
   }
@@ -153,7 +159,8 @@ object Parser {
 
       case DASH :: rest => parseSign(SimpleParseState(rest, parens)) match {
         case Left(error) => Left(error)
-        case Right(NestedParseState(newTokens, number, newParens)) => Right(NestedParseState(newTokens, SignNode(DASH, number), newParens))
+        case Right(NestedParseState(newTokens, number, newParens)) =>
+          Right(NestedParseState(newTokens, SignNode(DASH, number), newParens))
       }
 
       case _ => parseNumber(SimpleParseState(tokens, parens))
