@@ -177,8 +177,7 @@ object Parser {
     tokens match {
       case Nil => throw new ParserException("expression terminated where a value was expected")
       case NUMBER(string) :: rest =>
-        val value = string.toDouble
-        if (value.isInfinite) throw new ParserException("infinite value obtained")
+        if (string.toDouble.isInfinite) throw new ParserException("infinite value obtained")
         else NestedParseState(rest, NumberNode(string.toDouble), parens)
       case LPAREN :: rest => parseExpression(NestedParseState(rest, EmptyNode, LPAREN +: parens))
       case _ => throw new ParserException(s"found `${tokens.head.string}` where a value was expected")
