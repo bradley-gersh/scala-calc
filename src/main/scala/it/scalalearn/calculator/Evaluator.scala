@@ -36,7 +36,7 @@ object Evaluator {
 
     case SignNode(PLUS, expr) => evaluate(expr)
     case SignNode(DASH, expr) => evaluate(expr).map(-_)
-    case SignNode(op, _) => Left(InvalidOperatorException("invalid unary operator `${op.string}`"))
+    case SignNode(op, _) => Left(InvalidOperatorException(s"invalid unary operator `${op.string}`"))
 
     case FactorNode(STAR, expr1, expr2) => evaluate(expr1).flatMap(val1 => evaluate(expr2).map(val2 => val1 * val2))
     case FactorNode(SLASH, expr1, expr2) =>
