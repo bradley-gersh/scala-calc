@@ -19,19 +19,19 @@ object Lexer {
    * Processes a line of input for tokens.
    *
    * @param  input  string to be lexed
-   * @return        Either an error message or the list of tokens found in the input
+   * @return        Either an error or the list of tokens found in the input
    */
-  def read(input: String): Either[String, List[Token]] = read(input.toList, List[Token]())
+  def read(input: String): Either[CalculatorException, List[Token]] = read(input.toList, List[Token]())
 
   /**
    * Processes a line of input for tokens.
    *
    * @param  input  list of the characters yet to be processed
    * @param  tokens list of the tokens processed so far
-   * @return        Either an error message or a list of processed tokens
+   * @return        Either an error or a list of processed tokens
    */
   @tailrec
-  private def read(input: List[Char], tokens: List[Token]): Either[String, List[Token]] = {
+  private def read(input: List[Char], tokens: List[Token]): Either[CalculatorException, List[Token]] = {
     input match {
       // Finished processing
       case Nil => Right(tokens.reverse)
@@ -48,9 +48,12 @@ object Lexer {
 
       // One-character patterns
       case first +: rest => readSingleCharToken(first) match {
-        case UNKNOWN(unknownToken) => Left(s"unrecognized character $unknownToken")
+        case UNKNOWN(unknownToken) => Left(UnknownTokenException(s"unrecognized character $unknownToken"))
         case newToken => read(rest, newToken +: tokens)
       }
+
+      // Error
+      case unknown => Left(UnknownTokenException(s"unable to read this string: $unknown"))
     }
   }
 
@@ -76,14 +79,14 @@ object Lexer {
    * @param  input          list of the characters yet to be processed
    * @param  currToken      list of the characters to be wrapped in the current token
    * @param  fractionalPart currently lexing the fractional part of a decimal number
-   * @return                Either an error message or a 2-tuple containing both the remaining
+   * @return                Either an error or a 2-tuple containing both the remaining
    *                        characters to be processed and the newly generated Number token.
    */
   @tailrec
-  private def readNumberToken(input: List[Char], currToken: List[Char], fractionalPart: Boolean): Either[String, (List[Char], Token)] = {
+  private def readNumberToken(input: List[Char], currToken: List[Char], fractionalPart: Boolean): Either[CalculatorException, (List[Char], Token)] = {
     def flushNumber() = {
       val numberString = currToken.reverse.mkString
-      if (numberString == SEPARATOR.toString) Left("isolated . not permitted")
+      if (numberString == SEPARATOR.toString) Left(NumberFormattingException("isolated . not permitted"))
       else Right(input, NUMBER(numberString))
     }
 
@@ -91,7 +94,7 @@ object Lexer {
       case (first @ DIGITS()) :: rest => readNumberToken(rest, first :: currToken, fractionalPart)
       case (first @ SEPARATOR) +: rest =>
         if (!fractionalPart) readNumberToken(rest, first +: currToken, true)
-        else Left(s"only one '$SEPARATOR' character permitted per number")
+        else Left(NumberFormattingException(s"only one '$SEPARATOR' character permitted per number"))
       case _ => flushNumber()
     }
   }

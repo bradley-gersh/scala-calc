@@ -1,8 +1,6 @@
 package it.scalalearn.calculator
 
-import org.scalatest.funsuite.AnyFunSuite
-
-class PrinterTest extends AnyFunSuite {
+class PrinterTest extends BaseTest {
   test("Printer should return () for an empty parse tree") {
     val testEmpty = EmptyNode
     assert(Printer(testEmpty) === "()")

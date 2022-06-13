@@ -2,12 +2,10 @@ package it.scalalearn.calculator
 
 import scala.util.Right
 
-import org.scalatest.funsuite.AnyFunSuite
-
-class EvaluatorTest extends AnyFunSuite {
+class EvaluatorTest extends BaseTest {
   test("Evaluator should fail if attempting to evaluate an empty parse tree") {
     val testEmpty = EmptyNode
-    assert(Evaluator.eval(testEmpty).left.filterToOption(_ contains "incomplete input").nonEmpty)
+    assert(isError(Evaluator.eval(testEmpty), "incomplete input"))
   }
 
   test("Evaluator should evaluate a single number node") {
@@ -17,15 +15,15 @@ class EvaluatorTest extends AnyFunSuite {
 
   test("Evaluator should reject a number node with NaN") {
     val testNaN = NumberNode(Double.NaN)
-    assert(Evaluator.eval(testNaN).left.filterToOption(_ contains "NaN").nonEmpty)
+    assert(isError(Evaluator.eval(testNaN), "NaN"))
   }
 
   test("Evaluator should reject an infinite number node") {
     val testPositiveInfinity = NumberNode(Double.PositiveInfinity)
-    assert(Evaluator.eval(testPositiveInfinity).left.filterToOption(_ contains "infinite").nonEmpty)
+    assert(isError(Evaluator.eval(testPositiveInfinity), "infinite"))
 
     val testNegativeInfinity = NumberNode(Double.NegativeInfinity)
-    assert(Evaluator.eval(testNegativeInfinity).left.filterToOption(_ contains "infinite").nonEmpty)
+    assert(isError(Evaluator.eval(testNegativeInfinity), "infinite"))
   }
 
   test("Evaluator should fail if an infinite value is computed") {
@@ -34,7 +32,7 @@ class EvaluatorTest extends AnyFunSuite {
       NumberNode(99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999),
       NumberNode(99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999)
     )
-    assert(Evaluator.eval(testOverflow).left.filterToOption(_ contains "infinite").nonEmpty)
+    assert(isError(Evaluator.eval(testOverflow), "infinite"))
   }
 
   test("Evaluator should evaluate simple sums and differences") {
@@ -83,7 +81,7 @@ class EvaluatorTest extends AnyFunSuite {
       NumberNode(2.0),
       NumberNode(0)
     )
-    assert(Evaluator.eval(testDivZeroLiteral).left.filterToOption(_ contains "division by 0").nonEmpty)
+    assert(isError(Evaluator.eval(testDivZeroLiteral), "division by 0"))
 
     val testDivZeroSubexpression = FactorNode(
       SLASH,
@@ -93,7 +91,7 @@ class EvaluatorTest extends AnyFunSuite {
         NumberNode(5.0),
         NumberNode(5.0)
       ))
-    assert(Evaluator.eval(testDivZeroSubexpression).left.filterToOption(_ contains "division by 0").nonEmpty)
+    assert(isError(Evaluator.eval(testDivZeroSubexpression), "division by 0"))
 
     val testDivZeroSubexpressionRoundoff = FactorNode(
       SLASH,
@@ -103,13 +101,13 @@ class EvaluatorTest extends AnyFunSuite {
         NumberNode(5.0),
         NumberNode(4.9999999999999999999999)
       ))
-    assert(Evaluator.eval(testDivZeroSubexpressionRoundoff).left.filterToOption(_ contains "division by 0").nonEmpty)
+    assert(isError(Evaluator.eval(testDivZeroSubexpressionRoundoff), "division by 0"))
 
     val testZeroOverZero = FactorNode(
       SLASH,
       NumberNode(0),
       NumberNode(0)
     )
-    assert(Evaluator.eval(testZeroOverZero).left.filterToOption(_ contains "0/0").nonEmpty)
+    assert(isError(Evaluator.eval(testZeroOverZero), "0/0"))
   }
 }

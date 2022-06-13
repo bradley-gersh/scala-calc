@@ -1,8 +1,6 @@
 package it.scalalearn.calculator
 
-import org.scalatest.funsuite.AnyFunSuite
-
-class LexerTest extends AnyFunSuite {
+class LexerTest extends BaseTest {
   test("Lexer reads in a nonnegative integer string and produces a single Number token") {
     assert(Lexer.read("5") === Right(List(NUMBER("5"))))
     assert(Lexer.read("33") === Right(List(NUMBER("33"))))
@@ -41,15 +39,15 @@ class LexerTest extends AnyFunSuite {
   }
 
   test("Lexer should fail if it receives an unrecognized character.") {
-    assert(Lexer.read("&").left.filterToOption(_ contains "unrecognized character").nonEmpty)
+    assert(isError(Lexer.read("&"), "unrecognized character"))
   }
 
   test("Lexer should fail if two decimals appear in one number.") {
-    assert(Lexer.read("4.6.2").left.filterToOption(_ contains "only one").nonEmpty)
+    assert(isError(Lexer.read("4.6.2"), "only one"))
   }
 
   test("Lexer should fail if it receives an isolated decimal") {
-    assert(Lexer.read(".").left.filterToOption(_ contains "isolated").nonEmpty)
-    assert(Lexer.read("4 . 2").left.filterToOption(_ contains "isolated").nonEmpty)
+    assert(isError(Lexer.read("."), "isolated"))
+    assert(isError(Lexer.read("4 . 2"), "isolated"))
   }
 }

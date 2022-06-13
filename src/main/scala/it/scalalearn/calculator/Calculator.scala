@@ -60,7 +60,7 @@ object Calculator {
    * @param  input    a preprocessed string of user input to be evaluated
    * @return          Try of numerical value from evaluating input and the parse tree for possible printing
    */
-  def interpret(input: String): Either[String, (Double, ParseNode)] = {
+  def interpret(input: String): Either[CalculatorException, (Double, ParseNode)] = {
     for {
       tokens <- Lexer.read(input)
       tree <- Parser.parse(tokens)

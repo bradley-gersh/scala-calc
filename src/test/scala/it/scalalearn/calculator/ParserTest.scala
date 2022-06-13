@@ -1,10 +1,6 @@
 package it.scalalearn.calculator
 
-import org.scalatest.funsuite.AnyFunSuite
-
-// NOTE: For brevity, I have used the Printer function to verify that the
-// proper trees were produced. For better isolation, need to create separate trees.
-class ParserTest extends AnyFunSuite {
+class ParserTest extends BaseTest {
 
   // Test proper inputs
 
@@ -353,22 +349,22 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("Parser should fail if it receives adjacent numbers without an operator or parentheses") {
-    assert(Parser.parse(List(NUMBER("5"), NUMBER("1"))).left.filterToOption(_ contains "unparsed tokens").nonEmpty)
+    assert(isError(Parser.parse(List(NUMBER("5"), NUMBER("1"))), "unparsed tokens"))
   }
 
   test("Parser should fail if it receives unmatched closing parentheses") {
-    assert(Parser.parse(List(NUMBER("1"), SLASH, NUMBER("2"), RPAREN)).left.filterToOption(_ contains "unmatched `)`").nonEmpty)
+    assert(isError(Parser.parse(List(NUMBER("1"), SLASH, NUMBER("2"), RPAREN)), "unmatched `)`"))
   }
 
   test("Parser should fail if it has leftover unclosed parentheses") {
-    assert(Parser.parse(List(NUMBER("1"), SLASH, LPAREN, NUMBER("2"))).left.filterToOption(_ contains "unmatched `(`").nonEmpty)
+    assert(isError(Parser.parse(List(NUMBER("1"), SLASH, LPAREN, NUMBER("2"))), "unmatched `(`"))
   }
 
   test("Parser should fail if an infix binary operation is lacking two arguments") {
-    assert(Parser.parse(List(NUMBER("1"), SLASH)).left.filterToOption(_ contains "a value was expected").nonEmpty)
+    assert(isError(Parser.parse(List(NUMBER("1"), SLASH)), "a value was expected"))
 
-    assert(Parser.parse(List(SLASH, NUMBER("1"))).left.filterToOption(_ contains "a value was expected").nonEmpty)
+    assert(isError(Parser.parse(List(SLASH, NUMBER("1"))), "a value was expected"))
 
-    assert(Parser.parse(List(NUMBER("5"), PLUS, LPAREN, NUMBER("2"), STAR, RPAREN)).left.filterToOption(_ contains "a value was expected").nonEmpty)
+    assert(isError(Parser.parse(List(NUMBER("5"), PLUS, LPAREN, NUMBER("2"), STAR, RPAREN)), "a value was expected"))
   }
 }

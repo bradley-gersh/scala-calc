@@ -1,25 +1,19 @@
 package it.scalalearn.calculator
 
-class CalculatorException(private val message: String) extends RuntimeException(message)
+sealed trait CalculatorException(val message: String)
 
-class EvaluatorException(private val message: String) extends CalculatorException(message)
+class LexerException(message: String) extends CalculatorException(message)
+class ParserException(message: String) extends CalculatorException(message)
+class EvaluatorException(message: String) extends CalculatorException(message)
 
-class ParserException(private val message: String) extends CalculatorException(message)
+case class NumberFormattingException(override val message: String) extends LexerException(message)
+case class UnknownTokenException(override val message: String) extends LexerException(message)
 
-class InfiniteValueException(private val message: String) extends ParserException(message)
+case class InvalidOperatorException(override val message: String) extends ParserException(message)
+case class UnmatchedParenthesesException(override val message: String) extends ParserException(message)
+case class UnparsedTokensException(override val message: String) extends ParserException(message)
+case class EmptyNodeException(override val message: String) extends ParserException(message)
 
-class EmptyNodeException(private val message: String) extends ParserException(message)
-
-class DivisionByZeroException(private val message: String) extends ParserException(message)
-
-class InvalidOperatorException(private val message: String) extends ParserException(message)
-
-class UnparsedTokensException(private val message: String) extends ParserException(message)
-
-class UnmatchedParenthesesException(private val message: String) extends ParserException(message)
-
-class LexerException(private val message: String) extends CalculatorException(message)
-
-class UnknownTokenException(private val message: String) extends LexerException(message) {
-  override def getMessage: String = s"unrecognized character: $message"
-}
+case class DivisionByZeroException(override val message: String) extends EvaluatorException(message)
+case class InfiniteValueException(override val message: String) extends EvaluatorException(message)
+case class NaNValueException(override val message: String) extends EvaluatorException(message)

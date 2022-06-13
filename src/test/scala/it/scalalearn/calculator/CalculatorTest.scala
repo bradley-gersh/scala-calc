@@ -3,9 +3,7 @@ package it.scalalearn.calculator
 import java.io.{ByteArrayOutputStream, StringReader}
 import scala.util.Random
 
-import org.scalatest.funsuite.AnyFunSuite
-
-class CalculatorTest extends AnyFunSuite {
+class CalculatorTest extends BaseTest {
   private def nextRandomDouble(): Double = Random.nextDouble() * Random.nextInt(100) + 0.01
   private def wrap(answer: Double): String = s"= $answer\n"
 
