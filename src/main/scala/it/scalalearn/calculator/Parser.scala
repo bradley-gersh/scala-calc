@@ -179,8 +179,7 @@ object Parser {
       case Nil => Left("expression terminated where a value was expected")
 
       case NUMBER(string) :: rest =>
-        val value = string.toDouble
-        if (value.isInfinite) Left("infinite value obtained")
+        if (string.toDouble.isInfinite) Left("infinite value obtained")
         else Right(NestedParseState(rest, NumberNode(string.toDouble), parens))
 
       case LPAREN :: rest => parseExpression(NestedParseState(rest, EmptyNode, LPAREN +: parens))
