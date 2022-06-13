@@ -1,26 +1,25 @@
 package it.scalalearn.calculator
 
-import scala.util.Try
+import scala.util.{Try, Success, Failure}
 
 /**
  * Evaluates a given parse tree for the return value
  */
-object Evaluator extends Function[ParseNode, Try[Double]] {
+object Evaluator {
 
   /**
-   * Public access to the Evaluator function
+   * Evaluates the numerical value of a parse tree
    *
    * @param  tree  root node of the parse tree
    * @return       Try of the numerical value associated with evaluating the parse tree
    */
-  def apply(tree: ParseNode): Try[Double] = {
-    val value = Try(evaluate(tree))
-
-    if (value.isSuccess) {
-      if (value.get.isInfinite) Try(throw new EvaluatorException("infinite value obtained"))
-      else if (value.get == -0.0) Try(0.0) // the JVM allows -0.0, but we will not
-      else value
-    } else value
+  def eval(tree: ParseNode): Try[Double] = {
+    Try(evaluate(tree)) match {
+      case Success(value) if value.isInfinite => Try(throw new EvaluatorException("infinite value obtained"))
+      case Success(value) if value == -0.0 => Try(0.0)
+      case Success(value) => Success(value)
+      case Failure(exception) => Failure(exception)
+    }
   }
 
   /**

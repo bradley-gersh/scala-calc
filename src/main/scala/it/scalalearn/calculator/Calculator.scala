@@ -40,20 +40,24 @@ object Calculator {
    * @param  input  raw user input for parsing
    * @return        result from parsing and evaluating input
    */
-  def processInput(input: String): String =
-    val (expressionInput, viewTree) =
-      if (input(0) == '?') (input.tail, true)
-      else (input, false)
+  def processInput(input: String): String = {
+    if (input.nonEmpty) {
+      val (expressionInput, viewTree) =
+        if (input(0) == '?') (input.tail, true)
+        else (input, false)
 
-    val evalOutput = interpret(expressionInput)
+      val evalOutput = interpret(expressionInput)
 
-    evalOutput match {
-      case Success((value, tree)) => (
-        (if (viewTree) s"--> parse tree: ${Printer(tree).getOrElse("[error printing parse tree]")}\n" else "")
-          + s"= $value\n")
-      case Failure(exception: CalculatorException) => s"Syntax error: ${exception.getMessage}\n" // improper user input
-      case Failure(exception) => s"[error] $exception\n ${exception.printStackTrace()}\n" // software bug
-    }
+      evalOutput match {
+        case Success((value, tree)) => (
+          (if (viewTree) s"--> parse tree: ${Printer(tree).getOrElse("[error printing parse tree]")}\n" else "")
+            + s"= $value\n")
+        case Failure(exception: CalculatorException) => s"Syntax error: ${exception.getMessage}\n" // improper user input
+        case Failure(exception) => s"[error] $exception\n ${exception.printStackTrace()}\n" // software bug
+      }
+    } else ""
+  }
+
 
   /**
    * Evaluates an arithmetic expression using the lexer and parser
@@ -63,9 +67,9 @@ object Calculator {
    */
   def interpret(input: String): Try[(Double, ParseNode)] = {
     for {
-      tokens <- Lexer(input)
-      tree <- Parser(tokens)
-      value <- Evaluator(tree)
+      tokens <- Lexer.read(input)
+      tree <- Parser.parse(tokens)
+      value <- Evaluator.eval(tree)
     } yield (value, tree)
   }
 }

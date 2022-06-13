@@ -10,21 +10,21 @@ import scala.util.Try
 object Lexer {
 
   /**
-   * Public access to the Lexer object
-   *
-   * @param  input  string to be lexed
-   * @return        Try object wrapping the list of tokens found in the input
-   */
-  def apply(input: String): Try[List[Token]] = {
-    Try(read(input.toList, List[Token]()))
-  }
-
-  /**
    * Fragments (useful patterns that are not themselves tokens)
    */
   private final val SEPARATOR = '.' // May be ',' depending on locale
   private final val DIGITS = """\d+""".r.unanchored
   private final val WS = """\s+""".r.unanchored
+
+  /**
+   * Processes a line of input for tokens.
+   *
+   * @param  input  string to be lexed
+   * @return        Try object wrapping the list of tokens found in the input
+   */
+  def read(input: String): Try[List[Token]] = {
+    Try(read(input.toList, List[Token]()))
+  }
 
   /**
    * Processes a line of input for tokens.
@@ -48,18 +48,21 @@ object Lexer {
         read(newRest, numberToken +: tokens)
 
       // One-character patterns
-      case first +: rest =>
-        val newToken = first match {
-          case '(' => LPAREN
-          case ')' => RPAREN
-          case '+' => PLUS
-          case '-' => DASH
-          case '*' => STAR
-          case '/' => SLASH
-          case _ => throw new UnknownTokenException(first.toString)
-        }
-        read(rest, newToken +: tokens)
+      case first +: rest => read(rest, readSingleCharToken(first) +: tokens)
     }
+  }
+
+  /**
+   * Produce a single-character token
+   */
+  private def readSingleCharToken(char: Char): Token = char match {
+    case '(' => LPAREN
+    case ')' => RPAREN
+    case '+' => PLUS
+    case '-' => DASH
+    case '*' => STAR
+    case '/' => SLASH
+    case _ => throw new UnknownTokenException (char.toString)
   }
 
   /**

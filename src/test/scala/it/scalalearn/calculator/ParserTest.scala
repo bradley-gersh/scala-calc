@@ -12,29 +12,29 @@ class ParserTest extends AnyFunSuite {
   // Test proper inputs
 
   test("Parser should handle empty input") {
-    assert(Parser(List[Token]()) === Success(EmptyNode))
+    assert(Parser.parse(List[Token]()) === Success(EmptyNode))
   }
 
   test("Parser should parse non-negative numbers") {
-    assert(Parser(List(NUMBER("3"))) === Success(NumberNode(3)))
-    assert(Parser(List(NUMBER("30"))) === Success(NumberNode(30)))
-    assert(Parser(List(NUMBER("3.0"))) === Success(NumberNode(3.0)))
-    assert(Parser(List(NUMBER("3."))) === Success(NumberNode(3.0)))
-    assert(Parser(List(NUMBER("0.3"))) === Success(NumberNode(0.3)))
-    assert(Parser(List(NUMBER(".3"))) === Success(NumberNode(0.3)))
-    assert(Parser(List(NUMBER("03"))) === Success(NumberNode(3)))
+    assert(Parser.parse(List(NUMBER("3"))) === Success(NumberNode(3)))
+    assert(Parser.parse(List(NUMBER("30"))) === Success(NumberNode(30)))
+    assert(Parser.parse(List(NUMBER("3.0"))) === Success(NumberNode(3.0)))
+    assert(Parser.parse(List(NUMBER("3."))) === Success(NumberNode(3.0)))
+    assert(Parser.parse(List(NUMBER("0.3"))) === Success(NumberNode(0.3)))
+    assert(Parser.parse(List(NUMBER(".3"))) === Success(NumberNode(0.3)))
+    assert(Parser.parse(List(NUMBER("03"))) === Success(NumberNode(3)))
   }
 
   test("Parser should parse negative numbers (unary -)") {
-    assert(Parser(List(DASH, NUMBER("3")))
+    assert(Parser.parse(List(DASH, NUMBER("3")))
       === Success(SignNode(DASH, NumberNode(3))))
-    assert(Parser(List(DASH, NUMBER(".3")))
+    assert(Parser.parse(List(DASH, NUMBER(".3")))
       === Success(SignNode(DASH, NumberNode(0.3))))
   }
 
   test("Parser should parse two-term addition and subtraction") {
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         PLUS,
         NUMBER("3"))) ===
@@ -44,7 +44,7 @@ class ParserTest extends AnyFunSuite {
         NumberNode(3))))
 
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         DASH,
         NUMBER("3"))) ===
@@ -56,7 +56,7 @@ class ParserTest extends AnyFunSuite {
 
   test("Parser should parse two-factor multiplication and division") {
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         STAR,
         NUMBER("3"))) ===
@@ -66,7 +66,7 @@ class ParserTest extends AnyFunSuite {
         NumberNode(3))))
 
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         SLASH,
         NUMBER("3"))) ===
@@ -80,7 +80,7 @@ class ParserTest extends AnyFunSuite {
 
     // 4 + 0.5 - 6 - 2 + 4
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         PLUS,
         NUMBER("0.5"),
@@ -110,7 +110,7 @@ class ParserTest extends AnyFunSuite {
 
     // 4 * 0.5 / 6 * 2 / 4
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         STAR,
         NUMBER("0.5"),
@@ -140,7 +140,7 @@ class ParserTest extends AnyFunSuite {
 
     // 4 * 0.5 + 6
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         STAR,
         NUMBER("0.5"),
@@ -156,7 +156,7 @@ class ParserTest extends AnyFunSuite {
 
     // 4 + 0.5 * 6
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         PLUS,
         NUMBER("0.5"),
@@ -172,7 +172,7 @@ class ParserTest extends AnyFunSuite {
 
     // 4 + 0.5 * 6 - 2 / 4 * 9
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         PLUS,
         NUMBER("0.5"),
@@ -206,7 +206,7 @@ class ParserTest extends AnyFunSuite {
 
     // 4 * (0.5 + 6)
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         STAR,
         LPAREN,
@@ -224,7 +224,7 @@ class ParserTest extends AnyFunSuite {
 
     // (4 + 0.5) * 6
     assert(
-      Parser(List(
+      Parser.parse(List(
         LPAREN,
         NUMBER("4"),
         PLUS,
@@ -246,7 +246,7 @@ class ParserTest extends AnyFunSuite {
 
     // (2 + (3 * (2 - 5) + (2)) / -7) + (5 - 3)
     assert(
-      Parser(List(
+      Parser.parse(List(
         LPAREN,
         NUMBER("2"),
         PLUS,
@@ -300,7 +300,7 @@ class ParserTest extends AnyFunSuite {
 
     // 4 * (0.5 + ((6 - 2 * 2) / ((4 * 4) - 0.5) + 9))
     assert(
-      Parser(List(
+      Parser.parse(List(
         NUMBER("4"),
         STAR,
         LPAREN,
@@ -356,14 +356,14 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("Parser should fail if it receives adjacent numbers without an operator or parentheses") {
-    assert(convertTryToSuccessOrFailure(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser.parse(List(
       NUMBER("5"),
       NUMBER("1")))
     ).failure.exception.getMessage contains "unparsed tokens")
   }
 
   test("Parser should fail if it receives unmatched closing parentheses") {
-    assert(convertTryToSuccessOrFailure(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser.parse(List(
       NUMBER("1"),
       SLASH,
       NUMBER("2"),
@@ -372,7 +372,7 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("Parser should fail if it has leftover unclosed parentheses") {
-    assert(convertTryToSuccessOrFailure(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser.parse(List(
       NUMBER("1"),
       SLASH,
       LPAREN,
@@ -381,17 +381,17 @@ class ParserTest extends AnyFunSuite {
   }
 
   test("Parser should fail if an infix binary operation is lacking two arguments") {
-    assert(convertTryToSuccessOrFailure(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser.parse(List(
       NUMBER("1"),
       SLASH))
     ).failure.exception.getMessage contains "a value was expected")
 
-    assert(convertTryToSuccessOrFailure(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser.parse(List(
       SLASH,
       NUMBER("1")))
     ).failure.exception.getMessage contains "a value was expected")
 
-    assert(convertTryToSuccessOrFailure(Parser(List(
+    assert(convertTryToSuccessOrFailure(Parser.parse(List(
       NUMBER("5"),
       PLUS,
       LPAREN,

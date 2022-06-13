@@ -2,7 +2,7 @@ package it.scalalearn.calculator
 
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.util.Try
+import scala.util.{Try, Success, Failure}
 
 /**
  * Parser singleton to transform tokens into a syntax tree
@@ -10,35 +10,26 @@ import scala.util.Try
 object Parser {
 
   /**
-   * Public access to the Parser object
-   *
-   * @param  tokens a list of Tokens lexed from user input
-   * @return        Try object wrapping the parse tree determined by the tokens
-   */
-  def apply(tokens: List[Token]): Try[ParseNode] = {
-    Try(parseRoot(tokens))
-  }
-
-  /**
-   * Begin and terminate parsing by recursive descent
+   * Parse by recursive descent
    *
    * @param  tokens          a list of lexed Tokens
    * @return                 the parse tree determined by the tokens
    * @throws ParserException if there are leftover unparsed tokens
    * @throws ParserException if there are leftover unmatched parentheses
    */
-  private def parseRoot(tokens: List[Token]): ParseNode =
+  def parse(tokens: List[Token]): Try[ParseNode] =
     if (tokens.nonEmpty) {
-      parseExpression(NestedParseState(tokens, EmptyNode, List[Token]())) match {
-        case NestedParseState(excessTokens, _, _) if excessTokens.nonEmpty =>
-          if (excessTokens.contains(RPAREN)) throw new ParserException("unmatched `)`")
-          else throw new ParserException(
-            s"unparsed tokens: ${excessTokens.foldLeft(mutable.StringBuilder())((acc, token) => acc.append(token.string))}")
-        case NestedParseState(_, _, excessParens) if excessParens.nonEmpty =>
-          throw new ParserException(s"unmatched `(`: depth ${excessParens.length}")
-        case NestedParseState(_, tree, _) => tree
+      Try(parseExpression(NestedParseState(tokens, EmptyNode, List[Token]()))) match {
+        case Success(NestedParseState(excessTokens, _, _)) if excessTokens.nonEmpty =>
+          if (excessTokens.contains(RPAREN)) Try(throw new ParserException("unmatched `)`"))
+          else Try(throw new ParserException(
+            s"unparsed tokens: ${excessTokens.foldLeft(mutable.StringBuilder())((acc, token) => acc.append(token.string))}"))
+        case Success(NestedParseState(_, _, excessParens)) if excessParens.nonEmpty =>
+          Try(throw new ParserException(s"unmatched `(`: depth ${excessParens.length}"))
+        case Success(NestedParseState(_, tree, _)) => Try(tree)
+        case Failure(exception) => Failure(exception)
       }
-    } else EmptyNode
+    } else Try(EmptyNode)
 
   /**
    * Parses an expression, either wrapped in parentheses or in outermost scope
