@@ -3,7 +3,7 @@ package it.scalalearn.calculator
 /**
  * Valid tokens accepted by the calculator
  */
-sealed abstract class Token(val string: String)
+sealed abstract trait Token(val string: String)
 
 case object LPAREN extends Token(string ="(")
 case object RPAREN extends Token(string = ")")

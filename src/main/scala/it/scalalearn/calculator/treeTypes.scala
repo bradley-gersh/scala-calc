@@ -2,7 +2,7 @@ package it.scalalearn.calculator
 
 import scala.util.{Failure, Success, Try}
 
-sealed trait ParseNode() {
+sealed trait ParseNode {
    def isEmpty = false
 }
 
