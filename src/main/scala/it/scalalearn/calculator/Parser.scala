@@ -91,12 +91,12 @@ object Parser {
 
     // Process right expression
     tokensAfterLeft match {
-      case Nil => NestedParseState(tokensAfterLeft, leftRoot, newParensLeft)
+      case Nil => Right(NestedParseState(tokensAfterLeft, leftRoot, newParensLeft))
       case (first @ (PLUS | DASH)) :: rest =>
         val NestedParseState(tokensAfterRight, rightRoot, newParensRight) =
           parseFactor(NestedParseState(rest, EmptyNode, newParensLeft))
         parseTerm(NestedParseState(tokensAfterRight, TermNode(first, leftRoot, rightRoot), newParensRight))
-      case _ => NestedParseState(tokensAfterLeft, leftRoot, newParensLeft)
+      case _ => Right(NestedParseState(tokensAfterLeft, leftRoot, newParensLeft))
     }
   }
 
@@ -180,19 +180,12 @@ object Parser {
 
       case NUMBER(string) :: rest =>
         val value = string.toDouble
-<<<<<<< HEAD
-        if (value.isInfinite) throw new ParserException("infinite value obtained")
-        else NestedParseState(rest, NumberNode(string.toDouble), parens)
-      case LPAREN :: rest => parseExpression(NestedParseState(rest, EmptyNode, LPAREN +: parens))
-      case _ => throw new ParserException(s"found `${tokens.head.string}` where a value was expected")
-=======
         if (value.isInfinite) Left("infinite value obtained")
         else Right(NestedParseState(rest, NumberNode(string.toDouble), parens))
 
-      case LPAREN :: rest => parseExpression(NestedParseState(rest, EmptyNode(), LPAREN +: parens))
+      case LPAREN :: rest => parseExpression(NestedParseState(rest, EmptyNode, LPAREN +: parens))
 
       case _ => Left(s"found `${tokens.head.string}` where a value was expected")
->>>>>>> useTry
     }
   }
 }
