@@ -159,9 +159,9 @@ class CalculatorTest extends AnyFunSuite {
   }
 
   test("Calculator.processInput should fail in case of division by zero") {
-    assert(Calculator.processInput("4 / 0") contains "division by zero")
-    assert(Calculator.processInput("4 / (3 - 3)") contains "division by zero")
-    assert(Calculator.processInput("4 / (3 - 2.9999999999999999999999999999999999)") contains "division by zero")
+    assert(Calculator.processInput("4 / 0") contains "division by 0")
+    assert(Calculator.processInput("4 / (3 - 3)") contains "division by 0")
+    assert(Calculator.processInput("4 / (3 - 2.9999999999999999999999999999999999)") contains "division by 0")
   }
 
   test("Calculator.processInput should give a distinctive error for 0/0") {
