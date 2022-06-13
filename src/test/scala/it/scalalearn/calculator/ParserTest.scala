@@ -12,7 +12,7 @@ class ParserTest extends AnyFunSuite {
   // Test proper inputs
 
   test("Parser should handle empty input") {
-    assert(Parser(List[Token]()) === Success(EmptyNode()))
+    assert(Parser(List[Token]()) === Success(EmptyNode))
   }
 
   test("Parser should parse non-negative numbers") {

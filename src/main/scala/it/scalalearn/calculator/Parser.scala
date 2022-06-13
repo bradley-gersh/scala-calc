@@ -29,7 +29,7 @@ object Parser {
    */
   private def parseRoot(tokens: List[Token]): ParseNode =
     if (tokens.nonEmpty) {
-      parseExpression(NestedParseState(tokens, EmptyNode(), List[Token]())) match {
+      parseExpression(NestedParseState(tokens, EmptyNode, List[Token]())) match {
         case NestedParseState(excessTokens, _, _) if excessTokens.nonEmpty =>
           if (excessTokens.contains(RPAREN)) throw new ParserException("unmatched `)`")
           else throw new ParserException(
@@ -38,7 +38,7 @@ object Parser {
           throw new ParserException(s"unmatched `(`: depth ${excessParens.length}")
         case NestedParseState(_, tree, _) => tree
       }
-    } else EmptyNode()
+    } else EmptyNode
 
   /**
    * Parses an expression, either wrapped in parentheses or in outermost scope
@@ -66,7 +66,7 @@ object Parser {
         else NestedParseState(rest, leftRootIn, parens.tail)
       case _ =>
         val NestedParseState(remainingTokens, newExpr, newParens) =
-          parseTerm(NestedParseState(tokens, EmptyNode(), parens))
+          parseTerm(NestedParseState(tokens, EmptyNode, parens))
         if (newParens.nonEmpty) parseExpression(NestedParseState(remainingTokens, newExpr, newParens))
         else NestedParseState(remainingTokens, newExpr, newParens)
     }
@@ -97,7 +97,7 @@ object Parser {
       case Nil => NestedParseState(tokensAfterLeft, leftRoot, newParensLeft)
       case (first @ (PLUS | DASH)) :: rest =>
         val NestedParseState(tokensAfterRight, rightRoot, newParensRight) =
-          parseFactor(NestedParseState(rest, EmptyNode(), newParensLeft))
+          parseFactor(NestedParseState(rest, EmptyNode, newParensLeft))
         parseTerm(NestedParseState(tokensAfterRight, TermNode(first, leftRoot, rightRoot), newParensRight))
       case _ => NestedParseState(tokensAfterLeft, leftRoot, newParensLeft)
     }
@@ -180,7 +180,7 @@ object Parser {
         val value = string.toDouble
         if (value.isInfinite) throw new ParserException("infinite value obtained")
         else NestedParseState(rest, NumberNode(string.toDouble), parens)
-      case LPAREN :: rest => parseExpression(NestedParseState(rest, EmptyNode(), LPAREN +: parens))
+      case LPAREN :: rest => parseExpression(NestedParseState(rest, EmptyNode, LPAREN +: parens))
       case _ => throw new ParserException(s"found `${tokens.head.string}` where a value was expected")
     }
   }

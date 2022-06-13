@@ -19,7 +19,7 @@ object Printer extends Function[ParseNode, Try[String]] {
    * Returns a string representation of the parse tree in prefix notation
    */
   def printNodes: ParseNode => String = {
-    case EmptyNode() => "()"
+    case EmptyNode => "()"
     case NumberNode(value) => value.toString
     case f: FuncNode => f.exprs.map(expr => printNodes(expr))
                                .mkString(s"(${f.op.string} ", " ", ")")

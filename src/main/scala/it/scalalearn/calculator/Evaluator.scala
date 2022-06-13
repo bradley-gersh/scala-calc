@@ -35,7 +35,7 @@ object Evaluator extends Function[ParseNode, Try[Double]] {
    *
    */
   def evaluate: ParseNode => Double = {
-    case EmptyNode() => throw new ParserException("incomplete input; missing a sub-expression")
+    case EmptyNode => throw new ParserException("incomplete input; missing a sub-expression")
 
     case NumberNode(value) =>
       // a NaN value should not be found if the lexer works, so this will not be handled as a routine ParserException

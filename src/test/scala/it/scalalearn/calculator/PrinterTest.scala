@@ -7,7 +7,7 @@ import scala.util.Success
 
 class PrinterTest extends AnyFunSuite {
   test("Printer should return () for an empty parse tree") {
-    val testEmpty = EmptyNode()
+    val testEmpty = EmptyNode
     assert(Printer(testEmpty) === Success("()"))
   }
 

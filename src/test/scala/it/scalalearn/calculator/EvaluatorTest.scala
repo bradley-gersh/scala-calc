@@ -7,7 +7,7 @@ import org.scalatest.TryValues.convertTryToSuccessOrFailure
 
 class EvaluatorTest extends AnyFunSuite {
   test("Evaluator should fail if attempting to evaluate an empty parse tree") {
-    val testEmpty = EmptyNode()
+    val testEmpty = EmptyNode
     assert(convertTryToSuccessOrFailure(Evaluator(testEmpty)).failure.exception.getMessage contains "incomplete input")
   }
 
