@@ -2,7 +2,6 @@ package it.scalalearn.calculator
 
 import scala.annotation.tailrec
 import scala.collection.mutable
-import scala.util.Try
 
 /**
  * Parser singleton to transform tokens into a syntax tree
