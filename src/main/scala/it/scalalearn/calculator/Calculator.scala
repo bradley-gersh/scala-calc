@@ -2,7 +2,6 @@ package it.scalalearn.calculator
 
 import scala.annotation.tailrec
 import scala.io.StdIn.readLine
-import scala.util.{Try, Success, Failure}
 
 /**
  * Application for evaluating the numerical value of arithmetic expressions
@@ -46,18 +45,14 @@ object Calculator {
         if (input(0) == '?') (input.tail, true)
         else (input, false)
 
-      val evalOutput = interpret(expressionInput)
-
-      evalOutput match {
-        case Success((value, tree)) => (
-          (if (viewTree) s"--> parse tree: ${Printer(tree).getOrElse("[error printing parse tree]")}\n" else "")
+      interpret(expressionInput) match {
+        case Left(error) => s"[error]: $error\n"
+        case Right((value, tree)) => (
+          (if (viewTree) s"--> parse tree: ${Printer(tree)}\n" else "")
             + s"= $value\n")
-        case Failure(exception: CalculatorException) => s"Syntax error: ${exception.getMessage}\n" // improper user input
-        case Failure(exception) => s"[error] $exception\n ${exception.printStackTrace()}\n" // software bug
       }
     } else ""
   }
-
 
   /**
    * Evaluates an arithmetic expression using the lexer and parser
@@ -65,7 +60,7 @@ object Calculator {
    * @param  input    a preprocessed string of user input to be evaluated
    * @return          Try of numerical value from evaluating input and the parse tree for possible printing
    */
-  def interpret(input: String): Try[(Double, ParseNode)] = {
+  def interpret(input: String): Either[CalculatorException, (Double, ParseNode)] = {
     for {
       tokens <- Lexer.read(input)
       tree <- Parser.parse(tokens)

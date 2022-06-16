@@ -36,3 +36,5 @@ case object SLASH extends Token {
 }
 
 case class NUMBER(override val string: String) extends Token
+
+case class UNKNOWN(override val string: String) extends Token
