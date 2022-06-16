@@ -6,7 +6,7 @@ sealed trait ParseNode {
    def isEmpty = false
 }
 
-sealed trait FuncNode(val op: Token, val exprs: ParseNode*) extends ParseNode
+class FuncNode(val op: Token, val exprs: ParseNode*) extends ParseNode
 
 case object EmptyNode extends ParseNode {
    override def isEmpty = true
